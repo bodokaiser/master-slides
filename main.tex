@@ -43,7 +43,35 @@
 		\end{center}
 	\end{frame}
 	
-	\section{Introduction}
+	% why is QKD interesting? -> intersection of multiple disciplines (quantum information theory, quantum optics, communication engineering)	
+	\begin{frame}{Preview}
+		\begin{columns}[c, onlytextwidth]
+			\column{0.5\textwidth}
+			\setbeamertemplate{section in toc}[sections numbered]
+			\tableofcontents[hideallsubsections]
+			
+			\column{0.5\textwidth}
+			\begin{figure}
+				\begin{tikzpicture}[
+					venn circle/.style={draw, very thick, fill opacity=0.25, circle, minimum width=45mm},
+					venn label/.style={align=center},
+				]
+					\begin{scope}[blend group=soft light]
+						\node[venn circle, fill=yellow] (qp) at (90:1.4) {};
+						\node[venn circle, fill=green] (it) at (210:1.4) {};
+						\node[venn circle, fill=orange] (qp) at (330:1.4) {};
+					\end{scope}
+					
+					\node[venn label] {QKD};
+					\node[venn label] at (90:2.5) {Communication\\engineering};
+					\node[venn label] at (210:2.5) {Quantum\\physics};
+					\node[venn label] at (330:2.5) {Information\\theory};
+				\end{tikzpicture}
+			\end{figure}
+		\end{columns}
+	\end{frame}
+	
+	\section{Quantum key distribution}
 
 	% what is secure communication: integrity and confidentiality	
 	% key distribution problem
@@ -124,28 +152,6 @@
 				%\node[superblock, label={Bob}, fit=(bob key) (receiver)] {};
 			\end{tikzpicture}
 			\caption{Block diagram of a QKD system.}
-		\end{figure}
-	\end{frame}
-	
-	% why is QKD interesting? -> intersection of multiple disciplines (quantum information theory, quantum optics, communication engineering)
-	\begin{frame}
-		\begin{figure}
-			\begin{tikzpicture}[
-				venn circle/.style={draw, very thick, fill opacity=0.25, circle, minimum width=45mm},
-				venn label/.style={align=center},
-			]
-				\begin{scope}[blend group=soft light]
-					\node[venn circle, fill=yellow] (qp) at (90:1.4) {};
-					\node[venn circle, fill=green] (it) at (210:1.4) {};
-					\node[venn circle, fill=orange] (qp) at (330:1.4) {};
-				\end{scope}
-				
-				\node[venn label] {QKD};
-				\node[venn label] at (90:2.5) {Communication\\engineering};
-				\node[venn label] at (210:2.5) {Quantum\\physics};
-				\node[venn label] at (330:2.5) {Information\\theory};
-			\end{tikzpicture}
-			\caption{Venn diagram of the disciplines contributing to QKD.}
 		\end{figure}
 	\end{frame}
 	
@@ -331,6 +337,22 @@
 		\end{figure}
 	\end{frame}
 	
+	\section{Communication engineering}
+	
+	\begin{frame}{Pulse-shaping}
+		
+	\end{frame}
+	
+	\begin{frame}{Upconversion}
+		
+	\end{frame}
+	
+	\begin{frame}{Downconversion}
+		
+	\end{frame}
+	
+	\section{Problem and proposed solution}
+	
 	\begin{frame}{Problem statement}
 		\begin{columns}[c, onlytextwidth]
 			\column{0.4\textwidth}
@@ -347,18 +369,52 @@
 		\end{columns}
 	\end{frame}
 	
-	\section{Signal processing}
+	\section{Conclusion and outlook}
 	
-	\begin{frame}{Pulse-shaping}
-		
+	\begin{frame}
+		\begin{center}
+			\textbf{Postlude}
+			
+			How does light interact with matter?
+		\end{center}
 	\end{frame}
 	
-	\begin{frame}{Upconversion}
-		
-	\end{frame}
+	\appendix
 	
-	\begin{frame}{Downconversion}
+	\begin{frame}{Classical post-processing pipeline}
+		\begin{figure}
+	\begin{tikzpicture}[
+		block/.style={draw, very thick, minimum height=8mm},
+	]
+		\node[block, minimum width=8cm] (qt) at (0,0) {Quantum transmission};
+		\node[block, minimum width=8cm] (pt) at (0,-1.2) {Partitioning};
 		
+		\node[block, minimum width=3.5cm] (sm) at (-2.25,-2.4) {Symbol mapping};
+		\node[block, minimum width=4cm] (pe) at (2,-2.4) {Parameter estimation};
+		\node[block, minimum width=6cm] (ir) at (-1,-3.6) {Information reconciliation};
+		\node[block, minimum width=8cm] (pa) at (0,-4.8) {Privacy amplification};
+
+		\draw[-Latex] (qt) -- (pt);
+		\draw[Latex-] (sm.north) -- (sm.north|-pt.south);
+		\draw[Latex-] (pe.north) -- (pe.north|-pt.south);
+		\draw[-Latex] (sm.south) -- (sm.south|-ir.north);
+		\draw[-Latex] (ir.south) -- (ir.south|-pa.north);
+
+		\begin{scope}[transform canvas={xshift=-1cm}]
+			\draw[-Latex] (pe.south) -- (pe.south|-ir.north);
+		\end{scope}
+		\begin{scope}[transform canvas={xshift=1cm}]
+			\draw[-Latex] (pe.south) -- (pe.south|-pa.north);
+		\end{scope}
+		
+		\node[block, rotate=90, minimum width=2.4cm] (ver) at (5,-4) {Verification};
+		\node[block, rotate=90, minimum width=5.6cm] (abort) at (6.4,-2.4) {Abort protocol or discard block};
+		\draw[-Latex] (pe.east) -- (pe.east-|abort.north);
+		\draw[-Latex] (pa.east) -- (pa.east-|ver.north);
+		\draw[-Latex] (ver.south) -- (ver.south-|abort.north);
+	\end{tikzpicture}
+		\caption{Block diagram of classical post-processing pipeline.}
+		\end{figure}
 	\end{frame}
 	
 	% I am a little theory fanboy
@@ -606,54 +662,6 @@
 				\right\}
 			\end{split}
 		\end{equation}
-	\end{frame}
-	
-	\section{Conclusion}
-	
-	\begin{frame}
-		\begin{center}
-			\textbf{Postlude}
-			
-			How does light interact with matter?
-		\end{center}
-	\end{frame}
-	
-	\appendix
-	
-	\begin{frame}{Classical post-processing pipeline}
-		\begin{figure}
-	\begin{tikzpicture}[
-		block/.style={draw, very thick, minimum height=8mm},
-	]
-		\node[block, minimum width=8cm] (qt) at (0,0) {Quantum transmission};
-		\node[block, minimum width=8cm] (pt) at (0,-1.2) {Partitioning};
-		
-		\node[block, minimum width=3.5cm] (sm) at (-2.25,-2.4) {Symbol mapping};
-		\node[block, minimum width=4cm] (pe) at (2,-2.4) {Parameter estimation};
-		\node[block, minimum width=6cm] (ir) at (-1,-3.6) {Information reconciliation};
-		\node[block, minimum width=8cm] (pa) at (0,-4.8) {Privacy amplification};
-
-		\draw[-Latex] (qt) -- (pt);
-		\draw[Latex-] (sm.north) -- (sm.north|-pt.south);
-		\draw[Latex-] (pe.north) -- (pe.north|-pt.south);
-		\draw[-Latex] (sm.south) -- (sm.south|-ir.north);
-		\draw[-Latex] (ir.south) -- (ir.south|-pa.north);
-
-		\begin{scope}[transform canvas={xshift=-1cm}]
-			\draw[-Latex] (pe.south) -- (pe.south|-ir.north);
-		\end{scope}
-		\begin{scope}[transform canvas={xshift=1cm}]
-			\draw[-Latex] (pe.south) -- (pe.south|-pa.north);
-		\end{scope}
-		
-		\node[block, rotate=90, minimum width=2.4cm] (ver) at (5,-4) {Verification};
-		\node[block, rotate=90, minimum width=5.6cm] (abort) at (6.4,-2.4) {Abort protocol or discard block};
-		\draw[-Latex] (pe.east) -- (pe.east-|abort.north);
-		\draw[-Latex] (pa.east) -- (pa.east-|ver.north);
-		\draw[-Latex] (ver.south) -- (ver.south-|abort.north);
-	\end{tikzpicture}
-		\caption{Block diagram of classical post-processing pipeline.}
-		\end{figure}
 	\end{frame}
 
 \end{document}
