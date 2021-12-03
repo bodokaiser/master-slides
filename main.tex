@@ -7,6 +7,7 @@
 \usepackage{mathtools}
 \usepackage{derivative}
 \usepackage{makecell}
+\usepackage{siunitx}
 
 \usetheme{metropolis}
 
@@ -145,7 +146,7 @@
 			\caption{Summary of common characteristics among QKD protocols.}
 			\begin{tabular}{lc}
 				\toprule
-				Characteristic & Options \\
+				Protocol parameter & Typical options \\
 				\midrule
 				Schema & Entanglement-based or prepare-and-measure \\
 				Detection & Coherent or single-photon \\
@@ -157,8 +158,39 @@
 		\end{table}
 	\end{frame}
 	
-	\begin{frame}{Polarization-encoding qubit-based QKD}
-		
+	\begin{frame}{Qubit-based QKD}
+		\begin{columns}[T, onlytextwidth]
+			\column{0.4\textwidth}
+			\begin{figure}
+				\begin{tikzpicture}[line cap=round, line join=round]
+					\draw[very thick] (0,0) circle (2cm);
+					\draw[thick, rotate around={0.:(0.,0.)}, dash pattern=on 3pt off 3pt] (0,0) ellipse (2cm and 0.9cm);
+					\draw[-Circle] (0,0) -- (-1,1) node[above]{$\ket{\psi}$};
+			
+					\draw[-Latex] (0,0) -- (0,2) node[above]{$\ket{z_+}=\ket{0}$};
+					\draw[-Latex] (0,0) -- (-0.81,-0.8) node[below]{$\ket{x_+}$};
+					\draw[-Latex] (0,0) -- (2,0) node[right]{$\ket{y_+}$};
+			
+					\draw (0,-2) circle (1.5pt) node[below] {$\ket{z_-}=\ket{1}$};
+					\draw (-2,0) circle (1.5pt) node[left] {$\ket{y_-}$};
+				\end{tikzpicture}
+				\caption{Bloch sphere with pure quantum state $\ket{\psi}=c_1\ket{0}+c_2\ket{1}$.}
+			\end{figure}
+			\column{0.5\textwidth}
+			\begin{table}
+				\caption{Physical encodings or logical qubit.}
+				\begin{tabular}{lcc}
+					\toprule
+					Physical encoding & \multicolumn{2}{c}{Standard basis $\ket{0},\ket{1}$} \\
+					\midrule
+					Polarization & Horizontal & Vertical \\
+					Photon number & Vacuum & Photon \\
+					Time binning & Early & Late \\
+					Phase binning & \SI{0}{\degree} & \SI{180}{\degree} \\
+					\bottomrule
+				\end{tabular}
+			\end{table}
+		\end{columns}
 	\end{frame}
 	
 	\begin{frame}{Squeezing-encoding boson-based QKD}
