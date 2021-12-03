@@ -557,7 +557,7 @@
 			\end{split}
 		\end{equation}
 		\begin{equation}
-			\braket{1_f}
+			\braket{1_f}{1_f}
 			=
 			\int\frac{\dd[3]{p}}{(2\pi)^3}
 			\abs*{\frac{f\!\left(\omega(\vb{p}),\vb{p}\right)}{\sqrt{2\omega(\vb{p})}}}^2
@@ -576,10 +576,37 @@
 		\end{equation}
 	\end{frame}
 
-	
-	\section{Quantum theory of electro-optics}
-	
-	\section{Quantum communication theory}
+	\begin{frame}{Coherent state}
+		\begin{equation}
+			\hat{\alpha}
+			=
+			\hat{D}\left[\alpha\right]
+			\ket{0}
+		\end{equation}
+		\begin{equation}
+			\begin{split}
+				\hat{D}\left[\alpha\right]
+				&=
+				\exp\biggl\{
+					\hat{A}^{(+)}[\alpha]
+					-
+					\hat{A}^{(-)}[\alpha^*]
+				\biggr\}
+				\\
+				&=
+				\exp\left\{
+					\int\frac{\dd[3]{p}}{(2\pi)^3\sqrt{2\omega(\vb{p})}}
+					\left[
+						\alpha(\vb{p})
+						\hat{a}^\dagger(\vb{p})
+						-
+						\alpha(\vb{p})^*
+						\hat{a}(\vb{p})
+					\right]
+				\right\}
+			\end{split}
+		\end{equation}
+	\end{frame}
 	
 	\section{Conclusion}
 	
