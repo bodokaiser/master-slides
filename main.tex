@@ -1,10 +1,12 @@
-\documentclass{beamer}
+\documentclass[aspectratio=169]{beamer}
 
 \usepackage{amsmath}
+\usepackage{booktabs}
 \usepackage[english]{babel}
 \usepackage{unicode-math}
 \usepackage{mathtools}
 \usepackage{derivative}
+\usepackage{makecell}
 
 \usetheme{metropolis}
 
@@ -13,9 +15,9 @@
 
 \input{math}
 
-\usetikzlibrary{arrows.meta,fit,positioning}
+\usetikzlibrary{arrows.meta,fit,mindmap,positioning}
 
-\title{A theoretical framework for quantum-optical communication - towards CV-QKD}
+\title{A theoretical framework for CV-QKD}
 \date{\today}
 \author{Bodo Kaiser}
 \institute{Ludwig-Maximilians-Universität München}
@@ -32,58 +34,127 @@
 	\end{frame}
 	
 	\section{Introduction}
-	
+
+	% what is secure communication: integrity and confidentiality	
+	% key distribution problem
+	% public-key distribution
+	% information-theoretical secure for OTP but practically one uses AES
 	\begin{frame}{Secure communication}
 		\begin{figure}
-		\begin{tikzpicture}[
-			node distance=4mm,
-			block/.style={draw, very thick, minimum width=28mm, minimum height=8mm},		
-			superblock/.style={draw, very thick, inner sep=3mm},
-		]
-			\coordinate (in);
-			\node[block, above=7mm of in] (encryption) {Encryption};
-			\node[block, above=of encryption] (authentication) {Authentication};
-			\node[block, above=of authentication] (transmitter) {Transmission};
-			\node[block, right=6mm of transmitter] (channel) {Channel};
-			\node[block, right=6mm of channel] (receiver) {Receiption};
-			\node[block, below=of receiver] (verification) {Verification};
-			\node[block, below=of verification] (decryption) {Decryption};
-			\coordinate[below=7mm of decryption] (out);
-
-			\path (encryption) -- (verification) node[midway, block] (key) {Secret key};
-
-			\draw[-Latex] (key.west) -- (encryption.east);
-			\draw[-Latex] (key.west) -- (authentication.east);
-			\draw[-Latex] (key.east) -- (decryption.west);
-			\draw[-Latex] (key.east) -- (verification.west);
-			
-			\draw[-Latex] (in) -- (encryption);
-			\draw[-Latex] (encryption) -- (authentication);
-			\draw[-Latex] (authentication) -- (transmitter);
-			
-			\draw[-Latex] (decryption) -- (out);
-			\draw[-Latex] (verification) -- (decryption);
-			\draw[-Latex] (receiver) -- (verification);
+			\begin{tikzpicture}[
+				node distance=5mm,
+				arrow/.style={very thick, -Latex},
+				block/.style={draw, very thick, minimum width=28mm, minimum height=8mm},		
+				superblock/.style={draw, very thick, inner sep=4mm},
+			]
+				\coordinate (in);
+				\node[block, above=10mm of in] (encryption) {Encryption};
+				\node[block, above=of encryption] (authentication) {Authentication};
+				\node[block, above=of authentication] (transmitter) {Transmission};
+				\node[block, right=10mm of transmitter] (channel) {Channel};
+				\node[block, right=10mm of channel] (receiver) {Receiption};
+				\node[block, below=of receiver] (verification) {Verification};
+				\node[block, below=of verification] (decryption) {Decryption};
+				\coordinate[below=10mm of decryption] (out);
 	
-			\draw[-Latex] (transmitter) -- (channel.west);
-			\draw[-Latex] (channel.east) -- (receiver);
-			
-			\node[superblock, label={Alice}, fit=(encryption) (transmitter)] {};
-			\node[superblock, label={Bob}, fit=(decryption) (receiver)] {};
-		\end{tikzpicture}
-			\caption{Block diagram of a transmission system ensuring integrity and confidentiality of the transmitted using authentication and encryption, requiring a secret key.}
+				\path (encryption) -- (verification) node[midway, block] (key) {Secret key};
+	
+				\draw[arrow] (key.west) to[out=210, in=0] (encryption.east);
+				\draw[arrow] (key.west) to[out=150, in=0]  (authentication.east);
+				\draw[arrow] (key.east) to[out=-30, in=180] (decryption.west);
+				\draw[arrow] (key.east) to[out=30, in=180] (verification.west);
+
+				\draw[arrow] (in) -- (encryption);
+				\draw[arrow] (encryption) -- (authentication);
+				\draw[arrow] (authentication) -- (transmitter);
+				
+				\draw[arrow] (decryption) -- (out);
+				\draw[arrow] (verification) -- (decryption);
+				\draw[arrow] (receiver) -- (verification);
+		
+				\draw[arrow] (transmitter) -- (channel.west);
+				\draw[arrow] (channel.east) -- (receiver);
+				
+				\node[superblock, label={Alice}, fit=(encryption) (transmitter)] {};
+				\node[superblock, label={Bob}, fit=(decryption) (receiver)] {};
+			\end{tikzpicture}
+			\caption{Block diagram of a secure transmission system.}
+		\end{figure}
+	\end{frame}
+
+	% main idea of QKD:
+    % quantum transmission
+	% post-processing	
+	\begin{frame}{Quantum key distribution}
+		\begin{figure}
+			\begin{tikzpicture}[
+				node distance=5mm,
+				arrow/.style={very thick, -Latex},
+				block/.style={draw, very thick, minimum width=20mm, minimum height=8mm, text width=20mm, align=center},
+				superblock/.style={draw, very thick, inner sep=3mm},
+			]
+				\node[block] (transmitter) {QKD Transmitter};
+				\node[text width=12mm, align=center, left=8mm of transmitter] (alice key) {Secret key};
+	
+				\node[block, right=6mm of transmitter] (eve) {Eavesdropper};
+				\node[block, above=5mm of eve] (quantum channel) {Quantum channel};
+				\node[block, below=5mm of eve] (classical channel) {Classical channel};
+				\node[block, right=6mm of eve] (receiver) {QKD Receiver};
+				\node[text width=12mm, align=center, right=8mm of receiver] (bob key) {Secret key};
+				
+				\draw[arrow] (transmitter) -- (alice key);
+				\draw[arrow] (receiver) -- (bob key);
+				\draw[arrow] (eve) -- (classical channel);
+				\draw[arrow] (eve) -- (quantum channel);
+				\draw[arrow] (transmitter.north) -- (transmitter.north|-quantum channel.west) -- (quantum channel.west);
+				\draw[arrow] (transmitter.south) -- (transmitter.south|-classical channel.west) -- (classical channel.west);
+				\draw[arrow] (quantum channel.east) -- (quantum channel.east-|receiver.north) -- (receiver.north);
+				\draw[arrow] (classical channel.east) -- (classical channel.east-|receiver.south) -- (receiver.south);
+				
+				%\node[superblock, label={Alice}, fit=(alice key) (transmitter)] {};
+				%\node[superblock, label={Bob}, fit=(bob key) (receiver)] {};
+			\end{tikzpicture}
+			\caption{Block diagram of a QKD system.}
 		\end{figure}
 	\end{frame}
 	
-	\begin{frame}{Key distribution problem}
-		% public-key distribution
+	% why is QKD interesting? -> intersection of multiple disciplines (quantum information theory, quantum optics, communication engineering)
+	\begin{frame}
+		\begin{figure}
+			\begin{tikzpicture}[
+				venn circle/.style={draw, very thick, fill opacity=0.25, circle, minimum width=45mm},
+				venn label/.style={align=center},
+			]
+				\begin{scope}[blend group=soft light]
+					\node[venn circle, fill=yellow] (qp) at (90:1.4) {};
+					\node[venn circle, fill=green] (it) at (210:1.4) {};
+					\node[venn circle, fill=orange] (qp) at (330:1.4) {};
+				\end{scope}
+				
+				\node[venn label] {QKD};
+				\node[venn label] at (90:2.5) {Communication\\engineering};
+				\node[venn label] at (210:2.5) {Quantum\\physics};
+				\node[venn label] at (330:2.5) {Information\\theory};
+			\end{tikzpicture}
+			\caption{Venn diagram of the disciplines contributing to QKD.}
+		\end{figure}
 	\end{frame}
 	
-	\begin{frame}{Quantum key distribution}
-		Main idea of QKD:
-		- boson or qubit state
-		- quantum transmission
-		- post-processing
+	\begin{frame}{Taxonomy of QKD protocols}
+		\begin{table}
+			\caption{Summary of common characteristics among QKD protocols.}
+			\begin{tabular}{lc}
+				\toprule
+				Characteristic & Options \\
+				\midrule
+				Schema & Entanglement-based or prepare-and-measure \\
+				Detection & Coherent or single-photon \\
+				\makecell[l]{Measurement-\\basis selection} & Active or passive \\
+				Logical encoding & Qubit or Boson \\
+				Physical encoding & Polarization, quadratures, squeezing, ... \\
+				\bottomrule
+			\end{tabular}
+		\end{table}
 	\end{frame}
 	
 	\begin{frame}{Polarization-encoding qubit-based QKD}
