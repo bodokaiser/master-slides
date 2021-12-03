@@ -1,7 +1,8 @@
-\documentclass[aspectratio=169]{beamer}
+\documentclass[aspectratio=169,usenames,dvipsnames]{beamer}
 
 \usepackage{amsmath}
 \usepackage{booktabs}
+\usepackage{xcolor}
 \usepackage[english]{babel}
 \usepackage{unicode-math}
 \usepackage{mathtools}
@@ -9,6 +10,7 @@
 \usepackage{makecell}
 \usepackage{multirow}
 \usepackage{siunitx}
+\usepackage{pgfplots}
 \usepackage{appendixnumberbeamer}
 
 \usetheme{metropolis}
@@ -19,6 +21,11 @@
 \input{math}
 
 \usetikzlibrary{arrows.meta,fit,mindmap,positioning}
+
+\definecolor{exotic orange}{RGB}{255,128,0}
+\definecolor{exotic green}{RGB}{0,102,102}
+\definecolor{exotic blue}{RGB}{67,132,161}
+\definecolor{exotic red}{RGB}{250,86,86}
 
 \title{A theoretical framework for CV-QKD}
 \date{\today}
@@ -85,9 +92,8 @@
 		\end{figure}
 	\end{frame}
 
-	% main idea of QKD:
-    % quantum transmission
-	% post-processing	
+    % quantum transmission (random seed, correlated data)
+	% post-processing (shared secret key from correlated data)
 	\begin{frame}{Quantum key distribution}
 		\begin{figure}
 			\begin{tikzpicture}[
@@ -197,7 +203,7 @@
 		\end{columns}
 	\end{frame}
 	
-	\begin{frame}{Quantum transmission in qubit-based QKD and post-processing}
+	\begin{frame}{Quantum transmission in qubit-based QKD}
 		\begin{table}
 			\caption{Possible quantum transmission sequence for BB84.}
 			\begin{tabular}{lcccccc}
@@ -218,23 +224,358 @@
 		\end{table}
 	\end{frame}
 	
-	\begin{frame}{Squeezing-encoding boson-based QKD}
+	\begin{frame}{Squeezed-coherent-encoding QKD}
+		\begin{figure}
+			\begin{tikzpicture}
+				\begin{axis}[
+					height=7cm,
+					width=\linewidth,
+					axis lines=center,
+					axis line style=thick,
+					axis equal image,
+					xlabel={$\hat{X}(\vartheta)$},
+					ylabel={$\hat{X}(\vartheta+\pi/2)$},
+					ticks=none,
+					xmin=-2,
+					xmax=+2,
+					ymin=-2,
+					ymax=+2,
+					axis line style={thick},
+					x label style={
+						at={(axis description cs:1,0.5)},
+						anchor=north,
+					},
+					y label style={
+						at={(axis description cs:0.5,1)},
+						anchor=south,
+					},
+					cycle list name=exotic,
+						legend style={
+							at={(axis cs: 4,0)},
+							anchor=east,
+							inner sep=5,
+							outer sep=10,
+						},
+					legend cell align={left},
+				]
+					\addplot+[very thick] coordinates {(1,0)};
+					\addplot+[very thick] coordinates {(-1,0)};
+					\addplot+[very thick] coordinates {(0,1)};
+					\addplot+[very thick] coordinates {(0,-1)};
 		
+					\shadedraw[inner color=exotic green, outer color=exotic green!40, draw=none] (axis cs:1,0) ellipse (0.1 and 2);
+					\shadedraw[inner color=exotic orange, outer color=exotic orange!40, draw=none] (axis cs:-1,0) ellipse (0.1 and 2);
+					\shadedraw[inner color=exotic blue, outer color=exotic blue!40, draw=none] (axis cs:0,1) ellipse (2 and 0.1);
+					\shadedraw[inner color=exotic red, outer color=exotic red!40, draw=none] (axis cs:0,-1) ellipse (2 and 0.1);
+				\end{axis}
+			\end{tikzpicture}
+			\caption{Phase space diagram of squeezed-coherent states emulating BB84.}
+		\end{figure}
 	\end{frame}
 	
 	\begin{frame}{Coherent-encoding boson-based QKD}
+		\begin{figure}
+			\begin{tikzpicture}[
+				var/.style={draw, very thick, fill opacity=0.25, circle, minimum width=45mm},
+			]
+				\begin{axis}[
+					height=7cm,
+					width=\linewidth,
+					clip=false,
+					axis lines=center,
+					axis equal image,
+					axis line style=thick,
+					xlabel={$\hat{X}(\vartheta)$},
+					ylabel={$\hat{X}(\vartheta+\pi/2)$},
+					ticks=none,
+					xmin=-3,
+					xmax=+2.5,
+					ymin=-1.2,
+					ymax=+3,
+					axis line style={thick},
+					x label style={
+						anchor=north,
+					},
+					y label style={
+						anchor=south,
+					},
+					legend style={
+						at={(axis cs:-0.9,2.8)},
+						anchor=east,
+						draw=none,
+						inner sep=5,
+						outer sep=10,
+					},
+					legend columns=2,
+					legend cell align={left},
+				]
+					\begin{scope}[blend group=soft light]					
+						\draw[var, fill=exotic green] (axis cs:1.5,1.5) circle (2);
+						\draw[var, fill=exotic orange] (axis cs:0.2,0.2) circle (2);
+						\draw[var, fill=exotic blue] (axis cs:-1.5,0.5) circle (2);
+						\draw[var, fill=exotic red] (axis cs:-0.2,0.07) circle (2);
+					\end{scope}
+
+					\addplot[very thick, mark=*, exotic green] coordinates {(1.5,1.5)};	
+					\addplot[very thick, mark=*, exotic blue] coordinates {(-1.5,0.5)};	
+					\addplot[very thick, mark=*, exotic orange] coordinates {(0.2,0.2)};
+					\addplot[very thick, mark=*, exotic red] coordinates {(-0.2,0.07)};
+					\addplot[very thick, mark=x, mark size=4, exotic red] coordinates {(-0.9,-0.3)};
+					\addplot[very thick, mark=x, mark size=4, exotic orange] coordinates {(0.2,0.9)};
 		
+					\draw[-Latex, gray] (axis cs:1.5,1.5) -- (axis cs:0.2,0.2);
+					\draw[-Latex, gray] (axis cs:-1.5,0.5) -- (axis cs:-0.2,0.07);
+				\end{axis}
+			\end{tikzpicture}
+			\caption{Phase space diagram of coherent states including variance and examples for measurement outcomes.}
+		\end{figure}
 	\end{frame}
 	
 	\begin{frame}{Problem statement}
-		Venn-diagram of disciplines
-		and 
-		conflict
+		\begin{columns}[c, onlytextwidth]
+			\column{0.4\textwidth}
+			\begin{itemize}
+			    \item Foo
+			    \item Bar
+			    \item Baz
+			\end{itemize}
+			
+			\column{0.4\textwidth}
+			\begin{figure}
+				\caption{Block diagram of our approach.}
+			\end{figure}
+		\end{columns}
 	\end{frame}
 	
-	\section{Classical communication theory}
+	\section{Signal processing}
 	
-	\section{Quantum theory of light}
+	\begin{frame}{Pulse-shaping}
+		
+	\end{frame}
+	
+	\begin{frame}{Upconversion}
+		
+	\end{frame}
+	
+	\begin{frame}{Downconversion}
+		
+	\end{frame}
+	
+	% I am a little theory fanboy
+	% I think their general methods are often underappreciated
+	% However, to me their research problems are too far away from the experiment and self-centered
+	\section{Continuous-mode quantum theory of light}
+	
+	% Lagrangian from first principles (gauge symmetry, vector field, Lorentz scalar, order of derivatives)
+	% Field-theoretic framework (energy-momentum tensor, angular momentum tensor, conservation laws, ...)
+	% Covariant Maxwell equations follow directly
+	\begin{frame}{Maxwell Lagrangian and equations}
+		The Lagrangian density for the Maxwell field $A^\mu(t,\vb{x})$
+		\begin{equation}
+			\mathcal{L}
+			=
+			-
+			\frac{1}{4}
+			F_{\mu\nu}
+			F^{\mu\nu}
+			+
+			A_\mu j^\mu
+			,
+		\end{equation}
+		wherein
+		\begin{align}
+			F_{\mu\nu}
+			&=
+			\partial_\mu
+			A_\nu
+			-
+			\partial_\nu
+			A_\mu
+			&
+			\tilde{F}^{\mu\nu}
+			&=
+			\frac{1}{2}
+			\varepsilon^{\mu\nu\rho\sigma}
+			F_{\rho\sigma}
+		\end{align}
+		and employing variational calusu and the Bianchi identity lead us to the covariant formulation of the Maxwell equations
+		\begin{align}
+			\partial_\mu
+			\tilde{F}^{\mu\nu}
+			&=
+			0
+			&
+			\partial_\mu
+			F^{\mu\nu}
+			&=
+			j^\mu
+			.
+		\end{align}
+	\end{frame}
+
+	% interpretation of temporal and Coulomb gauge
+	% alternative to Lorenz gauge, we choose a gauge transform to remove non-transverse DOFs
+	% expectation value of the Maxwell field operator w.r.t. a coherent state
+	% Coulomb gauge in momentum space requires polarization vectors to be orthogonal to momentum vector
+	\begin{frame}{Transverse plane-wave expansion}
+		\begin{columns}[c, onlytextwidth]
+			\column{0.5\textwidth}
+			Temporal and Lorenz gauge
+			\begin{equation}
+				A_0
+				=
+				0
+				\quad
+				\text{and}
+				\quad
+				\partial_i
+				A^i
+				=
+				0
+			\end{equation}
+			the field becomes transverse and the equation of motion reduces to a relativistic wave equation
+			\begin{equation}
+				\partial_t^2
+				\vb{A}
+				=
+				\laplace
+				\vb{A}
+			\end{equation}
+			\begin{equation}
+				\vb{A}(t,\vb{x})
+				=
+				\int\frac{\dd[4]{p}}{(2\pi)^4}
+				\vb{A}(p_0,\vb{p})
+				e^{-ip_0t+i\vb{p}\vdot\vb{x}}
+			\end{equation}
+			
+			\column{0.5\textwidth}
+			\begin{equation}
+				p_0
+				=
+				\omega(\vb{p})
+				=
+				\norm{\vb{p}}
+			\end{equation}
+			\begin{equation}
+				\vb{A}(t,\vb{x})
+				=
+				\int\frac{\dd[3]{p}}{(2\pi)^3\sqrt{2\omega(\vb{p})}}
+				\vb{A}\!\left(\omega(\vb{p}),\vb{p}\right)
+				+
+				\text{c.c.}
+			\end{equation}
+			\begin{equation}
+				\vb{A}\!\left(\omega(\vb{p}),\vb{p}\right)
+				=
+				\sum_{\lambda=1,2}
+				a_\lambda(\vb{p})
+				\hat{a}_\lambda(\vb{p})
+				\vu{e}_\lambda(\vb{p})
+			\end{equation}
+		\end{columns}
+	\end{frame}
+	
+
+
+	\begin{frame}{Canonical quantization in the Coulomb gauge}
+		\begin{align}
+			\vu{A}^{(-)}(t,\vb{x})
+			&=
+			\sum_{\lambda=1,2}
+			\int\frac{\dd[3]{p}}{(2\pi)^3\sqrt{2\omega(\vb{p})}}
+			\hat{a}_\lambda(\vb{p})
+			\vu{e}_\lambda(\vb{p})
+			e^{-i\omega(\vb{p})t+i\vb{p}\vdot\vb{x}}
+			\\
+			\vu{E}^{(-)}(t,\vb{x})
+			&=
+			-i
+			\sum_{\lambda=1,2}
+			\int\frac{\dd[3]{p}}{(2\pi)^3\sqrt{2\omega(\vb{p})}}
+			\omega(\vb{p})
+			\hat{a}_\lambda(\vb{p})
+			\vu{e}_\lambda(\vb{p})
+			e^{-i\omega(\vb{p})t+i\vb{p}\vdot\vb{x}}
+		\end{align}
+		\begin{align}
+			\comm{\hat{A}_i(t,\vb{x})}{\hat{E}_j(t,\vb{y})}
+			&=
+			-i\delta_{\perp ij}^{(3)}(\vb{x}-\vb{y})
+			\\
+			\comm{\hat{A}_i(t,\vb{x})}{\hat{A}_j(t,\vb{y})}
+			&=
+			\comm{\hat{E}_i(t,\vb{x})}{\hat{E}_j(t,\vb{y})}
+			=
+			0
+		\end{align}
+		\begin{align}
+			\hat{H}
+			&=
+			\sum_{\lambda=1,2}
+			\int\frac{\dd[3]{p}}{(2\pi)^3}
+			\omega(\vb{p})
+			\hat{a}_\lambda^\dagger(\vb{p})
+			\hat{a}_\lambda(\vb{p})
+			&
+			\vu{P}
+			&=
+			\sum_{\lambda=1,2}
+			\int\frac{\dd[3]{p}}{(2\pi)^3}
+			\vb{p}
+			\hat{a}_\lambda^\dagger(\vb{p})
+			\hat{a}_\lambda(\vb{p})
+		\end{align}
+	\end{frame}
+	
+	\begin{frame}{Number state}
+		\begin{equation}
+			\begin{split}
+				\ket{n_f}
+				=
+				\frac{1}{\sqrt{n!}}
+				\hat{A}^{(+)}[f]^n
+				\ket{0}
+				&=
+				\frac{1}{\sqrt{n!}}
+				\left(
+					\int\dd[4]{x}
+					f(t,\vb{x})
+					\hat{A}^{(+)}(t,\vb{x})
+				\right)^n
+				\ket{0}
+				\\
+				&=
+				\frac{1}{\sqrt{n!}}
+				\left(
+					\int\frac{\dd[3]{p}}{(2\pi)^3\sqrt{2\omega(\vb{p})}}
+					f\!\left(\omega(\vb{p}),\vb{p}\right)
+					\hat{A}^{(+)}(t,\vb{x})
+					\hat{a}^\dagger(\vb{p})
+				\right)^n
+				\ket{0}
+			\end{split}
+		\end{equation}
+		\begin{equation}
+			\braket{1_f}
+			=
+			\int\frac{\dd[3]{p}}{(2\pi)^3}
+			\abs*{\frac{f\!\left(\omega(\vb{p}),\vb{p}\right)}{\sqrt{2\omega(\vb{p})}}}^2
+			=
+			1
+		\end{equation}
+		\begin{equation}
+			\bra{n_f}
+			\hat{H}
+			\ket{n_f}
+			=
+			n
+			\int\frac{\dd[3]{p}}{(2\pi)^3}
+			\omega(\vb{p})
+			\abs*{\frac{f\!\left(\omega(\vb{p}),\vb{p}\right)}{\sqrt{2\omega(\vb{p})}}}^2
+		\end{equation}
+	\end{frame}
+
 	
 	\section{Quantum theory of electro-optics}
 	
