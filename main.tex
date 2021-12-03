@@ -7,7 +7,9 @@
 \usepackage{mathtools}
 \usepackage{derivative}
 \usepackage{makecell}
+\usepackage{multirow}
 \usepackage{siunitx}
+\usepackage{appendixnumberbeamer}
 
 \usetheme{metropolis}
 
@@ -146,7 +148,7 @@
 			\caption{Summary of common characteristics among QKD protocols.}
 			\begin{tabular}{lc}
 				\toprule
-				Protocol parameter & Typical options \\
+				& Typical chacteristics \\
 				\midrule
 				Schema & Entanglement-based or prepare-and-measure \\
 				Detection & Coherent or single-photon \\
@@ -158,8 +160,8 @@
 		\end{table}
 	\end{frame}
 	
-	\begin{frame}{Qubit-based QKD}
-		\begin{columns}[T, onlytextwidth]
+	\begin{frame}{Logical and physical encoding in qubit-based QKD}
+		\begin{columns}[c, onlytextwidth]
 			\column{0.4\textwidth}
 			\begin{figure}
 				\begin{tikzpicture}[line cap=round, line join=round]
@@ -176,12 +178,14 @@
 				\end{tikzpicture}
 				\caption{Bloch sphere with pure quantum state $\ket{\psi}=c_1\ket{0}+c_2\ket{1}$.}
 			\end{figure}
-			\column{0.5\textwidth}
+			\column{0.6\textwidth}
 			\begin{table}
 				\caption{Physical encodings or logical qubit.}
 				\begin{tabular}{lcc}
 					\toprule
-					Physical encoding & \multicolumn{2}{c}{Standard basis $\ket{0},\ket{1}$} \\
+					& \multicolumn{2}{c}{Basis elements} \\
+					\cmidrule(lr){2-3}
+					&  $\ket{0}$ & $\ket{1}$ \\
 					\midrule
 					Polarization & Horizontal & Vertical \\
 					Photon number & Vacuum & Photon \\
@@ -191,6 +195,27 @@
 				\end{tabular}
 			\end{table}
 		\end{columns}
+	\end{frame}
+	
+	\begin{frame}{Quantum transmission in qubit-based QKD and post-processing}
+		\begin{table}
+			\caption{Possible quantum transmission sequence for BB84.}
+			\begin{tabular}{lcccccc}
+				\toprule
+				& \multirow{2}{*}{Step} & \multicolumn{5}{c}{Transmission iteration} \\
+				\cmidrule(lr){3-7}
+				& & 1 & 2 & 3 & 4 & 5 \\ 
+				\midrule
+				\multirow{3}{*}{Alice} & Symbol & \num{0} & \num{1} & \num{1} & \num{0} & \num{0} \\
+				& Encoding basis & $Z$ & $X$ & $X$ & $Z$ & $X$ \\
+				& Prepared state & $\ket{z_+}$ & $\ket{x_-}$ & $\ket{x_-}$ & $\ket{z_+}$ & $\ket{x_+}$ \\
+				\cmidrule{1-1}
+				\multirow{3}{*}{Bob} & Measurement basis & $X$ & $Z$ & $X$ & $Z$ & $Z$ \\
+				& Possible outcomes & \num{0},\num{1} & \num{0},\num{1} & \num{1} & \num{0} & \num{0},\num{1} \\
+				& Sifted outcomes & - & - & \num{1} & \num{0} & - \\
+				\bottomrule
+			\end{tabular}
+		\end{table}
 	\end{frame}
 	
 	\begin{frame}{Squeezing-encoding boson-based QKD}
@@ -224,4 +249,43 @@
 			How does light interact with matter?
 		\end{center}
 	\end{frame}
+	
+	\appendix
+	
+	\begin{frame}{Classical post-processing pipeline}
+		\begin{figure}
+	\begin{tikzpicture}[
+		block/.style={draw, very thick, minimum height=8mm},
+	]
+		\node[block, minimum width=8cm] (qt) at (0,0) {Quantum transmission};
+		\node[block, minimum width=8cm] (pt) at (0,-1.2) {Partitioning};
+		
+		\node[block, minimum width=3.5cm] (sm) at (-2.25,-2.4) {Symbol mapping};
+		\node[block, minimum width=4cm] (pe) at (2,-2.4) {Parameter estimation};
+		\node[block, minimum width=6cm] (ir) at (-1,-3.6) {Information reconciliation};
+		\node[block, minimum width=8cm] (pa) at (0,-4.8) {Privacy amplification};
+
+		\draw[-Latex] (qt) -- (pt);
+		\draw[Latex-] (sm.north) -- (sm.north|-pt.south);
+		\draw[Latex-] (pe.north) -- (pe.north|-pt.south);
+		\draw[-Latex] (sm.south) -- (sm.south|-ir.north);
+		\draw[-Latex] (ir.south) -- (ir.south|-pa.north);
+
+		\begin{scope}[transform canvas={xshift=-1cm}]
+			\draw[-Latex] (pe.south) -- (pe.south|-ir.north);
+		\end{scope}
+		\begin{scope}[transform canvas={xshift=1cm}]
+			\draw[-Latex] (pe.south) -- (pe.south|-pa.north);
+		\end{scope}
+		
+		\node[block, rotate=90, minimum width=2.4cm] (ver) at (5,-4) {Verification};
+		\node[block, rotate=90, minimum width=5.6cm] (abort) at (6.4,-2.4) {Abort protocol or discard block};
+		\draw[-Latex] (pe.east) -- (pe.east-|abort.north);
+		\draw[-Latex] (pa.east) -- (pa.east-|ver.north);
+		\draw[-Latex] (ver.south) -- (ver.south-|abort.north);
+	\end{tikzpicture}
+		\caption{Block diagram of classical post-processing pipeline.}
+		\end{figure}
+	\end{frame}
+
 \end{document}
