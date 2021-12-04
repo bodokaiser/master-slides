@@ -11,6 +11,7 @@
 \usepackage{multirow}
 \usepackage{siunitx}
 \usepackage{pgfplots}
+\usepackage{circuitikz}
 \usepackage{appendixnumberbeamer}
 
 \usetheme{metropolis}
@@ -43,32 +44,30 @@
 		\end{center}
 	\end{frame}
 	
-	% why is QKD interesting? -> intersection of multiple disciplines (quantum information theory, quantum optics, communication engineering)	
+	% why is QKD interesting? -> intersection of multiple disciplines (quantum information theory, quantum optics, communication engineering)
+	\begin{frame}
+		\begin{figure}
+			\begin{tikzpicture}[
+				venn circle/.style={draw, very thick, fill opacity=0.25, circle, minimum width=45mm},
+				venn label/.style={align=center},
+			]
+				\begin{scope}[blend group=soft light]
+					\node[venn circle, fill=yellow] (qp) at (90:1.4) {};
+					\node[venn circle, fill=green] (it) at (210:1.4) {};
+					\node[venn circle, fill=orange] (qp) at (330:1.4) {};
+				\end{scope}
+				
+				\node[venn label] {QKD};
+				\node[venn label] at (90:2.5) {Communication\\engineering};
+				\node[venn label] at (210:2.5) {Quantum\\physics};
+				\node[venn label] at (330:2.5) {Information\\theory};
+			\end{tikzpicture}
+		\end{figure}	
+	\end{frame}
+	
 	\begin{frame}{Preview}
-		\begin{columns}[c, onlytextwidth]
-			\column{0.5\textwidth}
-			\setbeamertemplate{section in toc}[sections numbered]
-			\tableofcontents[hideallsubsections]
-			
-			\column{0.5\textwidth}
-			\begin{figure}
-				\begin{tikzpicture}[
-					venn circle/.style={draw, very thick, fill opacity=0.25, circle, minimum width=45mm},
-					venn label/.style={align=center},
-				]
-					\begin{scope}[blend group=soft light]
-						\node[venn circle, fill=yellow] (qp) at (90:1.4) {};
-						\node[venn circle, fill=green] (it) at (210:1.4) {};
-						\node[venn circle, fill=orange] (qp) at (330:1.4) {};
-					\end{scope}
-					
-					\node[venn label] {QKD};
-					\node[venn label] at (90:2.5) {Communication\\engineering};
-					\node[venn label] at (210:2.5) {Quantum\\physics};
-					\node[venn label] at (330:2.5) {Information\\theory};
-				\end{tikzpicture}
-			\end{figure}
-		\end{columns}
+		\setbeamertemplate{section in toc}[sections numbered]
+		\tableofcontents[hideallsubsections]
 	\end{frame}
 	
 	\section{Quantum key distribution}
@@ -122,7 +121,7 @@
 
     % quantum transmission (random seed, correlated data)
 	% post-processing (shared secret key from correlated data)
-	\begin{frame}{Quantum key distribution}
+	\begin{frame}{quantum key distribution}
 		\begin{figure}
 			\begin{tikzpicture}[
 				node distance=5mm,
@@ -337,10 +336,76 @@
 		\end{figure}
 	\end{frame}
 	
-	\section{Communication engineering}
+	\section{Coherent transmission system}
 	
-	\begin{frame}{Pulse-shaping}
+	\begin{frame}{Overview}
+		\begin{figure}
+			\begin{tikzpicture}[
+				node distance=12mm,
+				arrow/.style={very thick, -Latex},
+				block/.style={draw, very thick, minimum height=12mm, minimum width=28mm, align=center},
+			]
+				\node[block] (source) {Information\\source};
+				\node[block, above=of source] (transmitter) {Transmitter};
+				\node[block, right=26mm of transmitter] (channel) {Channel};
+				\node[block, right=26mm of channel] (receiver) {Receiver};
+				\node[block, below=of receiver] (destination) {Information\\destination}; 
+				
+				\draw[arrow] (source) -- (transmitter) node[midway, left] {$\left\{\alpha_n\right\}_{n\in I}$};
+				\draw[arrow] (transmitter) -- (channel) node[midway, above] {$\Re\left\{\alpha(t)e^{-i\omega_c t}\right\}$};
+				\draw[arrow] (channel) -- (receiver) node[midway, above] {$\Re\left\{\beta(t)e^{-i\omega_c t}\right\}$};
+				\draw[arrow] (receiver) -- (destination) node[midway, right] {$\left\{\beta_n\right\}_{n\in I}$};;
+			\end{tikzpicture}
+			\caption{Coherent transmission system correlating an information destination with an information source.}
+		\end{figure}
+	\end{frame}
+	
+	\begin{frame}{Optical transmitter setups}
+		\begin{figure}
+			\centering
+			\includegraphics{figures/coherent-transmitter}
+			\caption{foo}
+		\end{figure}
+	\end{frame}
+	
+	\begin{frame}{Optical receiver setups}
+		\begin{figure}
+			\centering
+			\includegraphics{figures/coherent-receiver-active}
+			\caption{foo}
+		\end{figure}
+	\end{frame}
+	
+	\begin{frame}{Signal processing}
+		\begin{figure}
+			\begin{tikzpicture}[
+					node distance=20pt,
+			]
+				\node (in) {$z(t)$};
+				\node (mixa) [mixer, right=of in] {};
+				\node (low) [lowpassshape, right=of mixa] {};
+				\node (osca) [below=of mixa] {$\cos(\omega_ct+\vartheta)$};
+				\node (adc) [adcshape, right=of low] {};
+				\node (mixd) [mixer, right=of adc] {};
+				\node (oscd) [below=of mixd] {$\exp(i\omega_it)$};
+				\node (down1) [twoportshape, t={$\downarrow l$}, right=of mixd] {};
+				\node (rrc) [twoportshape, t={RRC}, right=of down1] {};
+				\node (down2) [twoportshape, t={$\downarrow k$}, right=of rrc] {};
+				\node (out) [right=of down2] {$\beta[n]$};
+	
+				\draw[-Latex] (in) -- (mixa.west);
+				\draw[-Latex] (mixa.east) -- (low.west);
+				\draw[-Latex] (low.east) -- (adc.west);
+				\draw[-Latex] (adc.east) -- (mixd.west);
+				\draw[-Latex] (mixd.east) -- (down1.west);
+				\draw[-Latex] (down1.east) -- (rrc.west);
+				\draw[-Latex] (rrc.east) -- (down2.west);
+				\draw[-Latex] (down2.east) -- (out.west);
 		
+				\draw[-Latex] (osca.north) -- (mixa.south);
+				\draw[-Latex] (oscd.north) -- (mixd.south);
+			\end{tikzpicture}
+		\end{figure}
 	\end{frame}
 	
 	\begin{frame}{Upconversion}
