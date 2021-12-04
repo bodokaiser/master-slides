@@ -21,7 +21,11 @@
 
 \input{math}
 
-\usetikzlibrary{arrows.meta,fit,mindmap,positioning}
+\pgfplotsset{compat=1.17}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{fit}
+\usetikzlibrary{positioning}
+\usepgfplotslibrary{groupplots}
 
 \definecolor{exotic orange}{RGB}{255,128,0}
 \definecolor{exotic green}{RGB}{0,102,102}
@@ -36,65 +40,58 @@
 \begin{document}
 	\maketitle
 	
-	\begin{frame}
-		\begin{center}
-			\textbf{Prelude}
-			
-			What is light?
-		\end{center}
-	\end{frame}
-	
-	% why is QKD interesting? -> intersection of multiple disciplines (quantum information theory, quantum optics, communication engineering)
-	\begin{frame}
-		\begin{figure}
-			\begin{tikzpicture}[
-				venn circle/.style={draw, very thick, fill opacity=0.25, circle, minimum width=45mm},
-				venn label/.style={align=center},
-			]
-				\begin{scope}[blend group=soft light]
-					\node[venn circle, fill=yellow] (qp) at (90:1.4) {};
-					\node[venn circle, fill=green] (it) at (210:1.4) {};
-					\node[venn circle, fill=orange] (qp) at (330:1.4) {};
-				\end{scope}
-				
-				\node[venn label] {QKD};
-				\node[venn label] at (90:2.5) {Communication\\engineering};
-				\node[venn label] at (210:2.5) {Quantum\\physics};
-				\node[venn label] at (330:2.5) {Information\\theory};
-			\end{tikzpicture}
-		\end{figure}	
-	\end{frame}
-	
+	% why is QKD interesting? -> intersection of multiple disciplines (quantum information theory, quantum optics, communication engineering)	
 	\begin{frame}{Preview}
-		\setbeamertemplate{section in toc}[sections numbered]
-		\tableofcontents[hideallsubsections]
+		\begin{columns}[c, onlytextwidth]
+			\column{0.6\textwidth}
+			\begin{figure}
+				\begin{tikzpicture}[
+					venn circle/.style={draw, very thick, fill opacity=0.25, circle, minimum width=45mm},
+					venn label/.style={align=center},
+				]
+					\begin{scope}[blend group=soft light]
+						\node[venn circle, fill=exotic red] (qp) at (90:1.4) {};
+						\node[venn circle, fill=exotic green] (it) at (210:1.4) {};
+						\node[venn circle, fill=exotic orange] (qp) at (330:1.4) {};
+					\end{scope}
+					
+					\node[venn label] {QKD};
+					\node[venn label] at (90:2.5) {Communication\\engineering};
+					\node[venn label] at (210:2.5) {Quantum\\physics};
+					\node[venn label] at (330:2.5) {Information\\theory};
+				\end{tikzpicture}
+			\end{figure}
+
+			\column{0.4\textwidth}
+			\setbeamertemplate{section in toc}[sections numbered]
+			\tableofcontents[hideallsubsections]
+		\end{columns}
 	\end{frame}
 	
-	\section{Quantum key distribution}
+	\section{Introduction}
 
 	% what is secure communication: integrity and confidentiality	
 	% key distribution problem
 	% public-key distribution
 	% information-theoretical secure for OTP but practically one uses AES
-	\begin{frame}{Secure communication}
+	\begin{frame}{Secure transmission system}
 		\begin{figure}
 			\begin{tikzpicture}[
 				node distance=5mm,
 				arrow/.style={very thick, -Latex},
-				block/.style={draw, very thick, minimum width=28mm, minimum height=8mm},		
-				superblock/.style={draw, very thick, inner sep=4mm},
+				block/.style={draw, very thick, minimum width=28mm, minimum height=10mm},		
 			]
 				\coordinate (in);
-				\node[block, above=10mm of in] (encryption) {Encryption};
-				\node[block, above=of encryption] (authentication) {Authentication};
-				\node[block, above=of authentication] (transmitter) {Transmission};
+				\node[block, above=of in] (encryption) {Encrypter};
+				\node[block, above=of encryption] (authentication) {Authenticator};
+				\node[block, above=of authentication] (transmitter) {Transmitter};
 				\node[block, right=10mm of transmitter] (channel) {Channel};
-				\node[block, right=10mm of channel] (receiver) {Receiption};
-				\node[block, below=of receiver] (verification) {Verification};
-				\node[block, below=of verification] (decryption) {Decryption};
-				\coordinate[below=10mm of decryption] (out);
+				\node[block, right=10mm of channel] (receiver) {Receiver};
+				\node[block, below=of receiver] (verification) {Verificier};
+				\node[block, below=of verification] (decryption) {Decrypter};
+				\coordinate[below=of decryption] (out);
 	
-				\path (encryption) -- (verification) node[midway, block] (key) {Secret key};
+				\path (encryption) -- (verification) node[midway, block, align=center] (key) {Secret-key};
 	
 				\draw[arrow] (key.west) to[out=210, in=0] (encryption.east);
 				\draw[arrow] (key.west) to[out=150, in=0]  (authentication.east);
@@ -112,8 +109,8 @@
 				\draw[arrow] (transmitter) -- (channel.west);
 				\draw[arrow] (channel.east) -- (receiver);
 				
-				\node[superblock, label={Alice}, fit=(encryption) (transmitter)] {};
-				\node[superblock, label={Bob}, fit=(decryption) (receiver)] {};
+				\node[label={Alice}, fit=(encryption) (transmitter)] {};
+				\node[label={Bob}, fit=(decryption) (receiver)] {};
 			\end{tikzpicture}
 			\caption{Block diagram of a secure transmission system.}
 		\end{figure}
@@ -121,170 +118,53 @@
 
     % quantum transmission (random seed, correlated data)
 	% post-processing (shared secret key from correlated data)
-	\begin{frame}{quantum key distribution}
+	\begin{frame}{Quantum key distribution system}
 		\begin{figure}
 			\begin{tikzpicture}[
 				node distance=5mm,
 				arrow/.style={very thick, -Latex},
-				block/.style={draw, very thick, minimum width=20mm, minimum height=8mm, text width=20mm, align=center},
-				superblock/.style={draw, very thick, inner sep=3mm},
+				block/.style={draw, very thick, minimum width=28mm, minimum height=10mm},		
 			]
-				\node[block] (transmitter) {QKD Transmitter};
-				\node[text width=12mm, align=center, left=8mm of transmitter] (alice key) {Secret key};
-	
-				\node[block, right=6mm of transmitter] (eve) {Eavesdropper};
-				\node[block, above=5mm of eve] (quantum channel) {Quantum channel};
-				\node[block, below=5mm of eve] (classical channel) {Classical channel};
-				\node[block, right=6mm of eve] (receiver) {QKD Receiver};
-				\node[text width=12mm, align=center, right=8mm of receiver] (bob key) {Secret key};
-				
-				\draw[arrow] (transmitter) -- (alice key);
-				\draw[arrow] (receiver) -- (bob key);
-				\draw[arrow] (eve) -- (classical channel);
-				\draw[arrow] (eve) -- (quantum channel);
-				\draw[arrow] (transmitter.north) -- (transmitter.north|-quantum channel.west) -- (quantum channel.west);
-				\draw[arrow] (transmitter.south) -- (transmitter.south|-classical channel.west) -- (classical channel.west);
-				\draw[arrow] (quantum channel.east) -- (quantum channel.east-|receiver.north) -- (receiver.north);
-				\draw[arrow] (classical channel.east) -- (classical channel.east-|receiver.south) -- (receiver.south);
-				
-				%\node[superblock, label={Alice}, fit=(alice key) (transmitter)] {};
-				%\node[superblock, label={Bob}, fit=(bob key) (receiver)] {};
+				\node[block] (alice) {Alice};
+				\node[block, right=14mm of alice] (eve) {Eve};
+				\node[block, above=10mm of eve] (quantum channel) {Quantum channel};
+				\node[block, below=10mm of eve] (classical channel) {Classical channel};
+				\node[block, right=14mm of eve] (bob) {Bob};
+
+				\draw[arrow] (eve) -- (classical channel) node[midway, left, yshift=1mm] {read};
+				\draw[arrow] (eve) -- (quantum channel) node[midway, left, yshift=-1mm] {read} node[midway, right, yshift=-1mm] {write};
+				\draw[arrow] (alice.north) -- (alice.north|-quantum channel.west) -- (quantum channel.west);
+				\draw[arrow, Latex-Latex] (alice.south) -- (alice.south|-classical channel.west) -- (classical channel.west);
+				\draw[arrow] (quantum channel.east) -- (quantum channel.east-|bob.north) -- (bob.north);
+				\draw[arrow, Latex-Latex] (classical channel.east) -- (classical channel.east-|bob.south) -- (bob.south);
 			\end{tikzpicture}
-			\caption{Block diagram of a QKD system.}
+			\caption{Block diagram of a quantum key distribution (QKD) system.}
 		\end{figure}
 	\end{frame}
 	
-	\begin{frame}{Taxonomy of QKD protocols}
-		\begin{table}
-			\caption{Summary of common characteristics among QKD protocols.}
-			\begin{tabular}{lc}
+	\begin{frame}{Discrete and continuous-variable QKD}
+		\begin{table}[htb]
+			\caption{Comparison of discrete- and continuous-variable QKD.}
+			\begin{tabular}{lcc}
 				\toprule
-				& Typical chacteristics \\
+					& Discrete & Continuous \\
 				\midrule
-				Schema & Entanglement-based or prepare-and-measure \\
-				Detection & Coherent or single-photon \\
-				\makecell[l]{Measurement-\\basis selection} & Active or passive \\
-				Logical encoding & Qubit or Boson \\
-				Physical encoding & Polarization, quadratures, squeezing, ... \\
+					Visualization & Bloch sphere & Phase space \\
+					Hilbert space (dim) & Finite (two) & Countable (infinite) \\
+					Observable & $\vb{\hat{S}}(\vb{n})=\hat{S}_in^i$ & $\hat{X}(\vartheta)=\frac{1}{\sqrt{2}}\left(\hat{a}e^{-i\vartheta}+\hat{a}^\dagger e^{+i\vartheta}\right)$ \\
+					Standard basis & $\left\{\ket{0},\ket{1}\right\}$ & $\left\{\ket{x},\ket{p}\right\}_{x,p\in\mathbb{R}}$ \\
 				\bottomrule
 			\end{tabular}
 		\end{table}
 	\end{frame}
 	
-	\begin{frame}{Logical and physical encoding in qubit-based QKD}
-		\begin{columns}[c, onlytextwidth]
-			\column{0.4\textwidth}
-			\begin{figure}
-				\begin{tikzpicture}[line cap=round, line join=round]
-					\draw[very thick] (0,0) circle (2cm);
-					\draw[thick, rotate around={0.:(0.,0.)}, dash pattern=on 3pt off 3pt] (0,0) ellipse (2cm and 0.9cm);
-					\draw[-Circle] (0,0) -- (-1,1) node[above]{$\ket{\psi}$};
-			
-					\draw[-Latex] (0,0) -- (0,2) node[above]{$\ket{z_+}=\ket{0}$};
-					\draw[-Latex] (0,0) -- (-0.81,-0.8) node[below]{$\ket{x_+}$};
-					\draw[-Latex] (0,0) -- (2,0) node[right]{$\ket{y_+}$};
-			
-					\draw (0,-2) circle (1.5pt) node[below] {$\ket{z_-}=\ket{1}$};
-					\draw (-2,0) circle (1.5pt) node[left] {$\ket{y_-}$};
-				\end{tikzpicture}
-				\caption{Bloch sphere with pure quantum state $\ket{\psi}=c_1\ket{0}+c_2\ket{1}$.}
-			\end{figure}
-			\column{0.6\textwidth}
-			\begin{table}
-				\caption{Physical encodings or logical qubit.}
-				\begin{tabular}{lcc}
-					\toprule
-					& \multicolumn{2}{c}{Basis elements} \\
-					\cmidrule(lr){2-3}
-					&  $\ket{0}$ & $\ket{1}$ \\
-					\midrule
-					Polarization & Horizontal & Vertical \\
-					Photon number & Vacuum & Photon \\
-					Time binning & Early & Late \\
-					Phase binning & \SI{0}{\degree} & \SI{180}{\degree} \\
-					\bottomrule
-				\end{tabular}
-			\end{table}
-		\end{columns}
-	\end{frame}
-	
-	\begin{frame}{Quantum transmission in qubit-based QKD}
-		\begin{table}
-			\caption{Possible quantum transmission sequence for BB84.}
-			\begin{tabular}{lcccccc}
-				\toprule
-				& \multirow{2}{*}{Step} & \multicolumn{5}{c}{Transmission iteration} \\
-				\cmidrule(lr){3-7}
-				& & 1 & 2 & 3 & 4 & 5 \\ 
-				\midrule
-				\multirow{3}{*}{Alice} & Symbol & \num{0} & \num{1} & \num{1} & \num{0} & \num{0} \\
-				& Encoding basis & $Z$ & $X$ & $X$ & $Z$ & $X$ \\
-				& Prepared state & $\ket{z_+}$ & $\ket{x_-}$ & $\ket{x_-}$ & $\ket{z_+}$ & $\ket{x_+}$ \\
-				\cmidrule{1-1}
-				\multirow{3}{*}{Bob} & Measurement basis & $X$ & $Z$ & $X$ & $Z$ & $Z$ \\
-				& Possible outcomes & \num{0},\num{1} & \num{0},\num{1} & \num{1} & \num{0} & \num{0},\num{1} \\
-				& Sifted outcomes & - & - & \num{1} & \num{0} & - \\
-				\bottomrule
-			\end{tabular}
-		\end{table}
-	\end{frame}
-	
-	\begin{frame}{Squeezed-coherent-encoding QKD}
-		\begin{figure}
-			\begin{tikzpicture}
-				\begin{axis}[
-					height=7cm,
-					width=\linewidth,
-					axis lines=center,
-					axis line style=thick,
-					axis equal image,
-					xlabel={$\hat{X}(\vartheta)$},
-					ylabel={$\hat{X}(\vartheta+\pi/2)$},
-					ticks=none,
-					xmin=-2,
-					xmax=+2,
-					ymin=-2,
-					ymax=+2,
-					axis line style={thick},
-					x label style={
-						at={(axis description cs:1,0.5)},
-						anchor=north,
-					},
-					y label style={
-						at={(axis description cs:0.5,1)},
-						anchor=south,
-					},
-					cycle list name=exotic,
-						legend style={
-							at={(axis cs: 4,0)},
-							anchor=east,
-							inner sep=5,
-							outer sep=10,
-						},
-					legend cell align={left},
-				]
-					\addplot+[very thick] coordinates {(1,0)};
-					\addplot+[very thick] coordinates {(-1,0)};
-					\addplot+[very thick] coordinates {(0,1)};
-					\addplot+[very thick] coordinates {(0,-1)};
-		
-					\shadedraw[inner color=exotic green, outer color=exotic green!40, draw=none] (axis cs:1,0) ellipse (0.1 and 2);
-					\shadedraw[inner color=exotic orange, outer color=exotic orange!40, draw=none] (axis cs:-1,0) ellipse (0.1 and 2);
-					\shadedraw[inner color=exotic blue, outer color=exotic blue!40, draw=none] (axis cs:0,1) ellipse (2 and 0.1);
-					\shadedraw[inner color=exotic red, outer color=exotic red!40, draw=none] (axis cs:0,-1) ellipse (2 and 0.1);
-				\end{axis}
-			\end{tikzpicture}
-			\caption{Phase space diagram of squeezed-coherent states emulating BB84.}
-		\end{figure}
-	\end{frame}
-	
-	\begin{frame}{Coherent-encoding boson-based QKD}
+	\begin{frame}{Continuous-variable QKD using coherent states}
 		\begin{figure}
 			\begin{tikzpicture}[
 				var/.style={draw, very thick, fill opacity=0.25, circle, minimum width=45mm},
 			]
 				\begin{axis}[
-					height=7cm,
+					height=6cm,
 					width=\linewidth,
 					clip=false,
 					axis lines=center,
@@ -293,155 +173,395 @@
 					xlabel={$\hat{X}(\vartheta)$},
 					ylabel={$\hat{X}(\vartheta+\pi/2)$},
 					ticks=none,
-					xmin=-3,
-					xmax=+2.5,
+					xmin=-6,
+					xmax=+6.5,
 					ymin=-1.2,
 					ymax=+3,
 					axis line style={thick},
-					x label style={
-						anchor=north,
-					},
-					y label style={
-						anchor=south,
-					},
-					legend style={
-						at={(axis cs:-0.9,2.8)},
-						anchor=east,
-						draw=none,
-						inner sep=5,
-						outer sep=10,
-					},
-					legend columns=2,
-					legend cell align={left},
+					x label style={anchor=north},
+					y label style={anchor=south},
 				]
 					\begin{scope}[blend group=soft light]					
-						\draw[var, fill=exotic green] (axis cs:1.5,1.5) circle (2);
-						\draw[var, fill=exotic orange] (axis cs:0.2,0.2) circle (2);
-						\draw[var, fill=exotic blue] (axis cs:-1.5,0.5) circle (2);
-						\draw[var, fill=exotic red] (axis cs:-0.2,0.07) circle (2);
+						\draw[var, fill=exotic green] (axis cs:-5,-0.5) circle (1);
+						\draw[var, fill=exotic red] (axis cs:4,2.5) circle (1);
+						
+						\draw[var, fill=exotic blue] (axis cs:-0.25,-0.025) circle (1);
+						\draw[var, fill=exotic orange] (axis cs:0.2,0.125) circle (1);
 					\end{scope}
 
-					\addplot[very thick, mark=*, exotic green] coordinates {(1.5,1.5)};	
-					\addplot[very thick, mark=*, exotic blue] coordinates {(-1.5,0.5)};	
-					\addplot[very thick, mark=*, exotic orange] coordinates {(0.2,0.2)};
-					\addplot[very thick, mark=*, exotic red] coordinates {(-0.2,0.07)};
-					\addplot[very thick, mark=x, mark size=4, exotic red] coordinates {(-0.9,-0.3)};
-					\addplot[very thick, mark=x, mark size=4, exotic orange] coordinates {(0.2,0.9)};
+					\addplot[very thick, mark=*, exotic green] coordinates {(-5,-0.5)};
+					\addplot[very thick, mark=*, exotic red] coordinates {(4,2.5)};					
+					\addplot[very thick, mark=*, exotic blue] coordinates {(-0.25,-0.025)};
+					\addplot[very thick, mark=*, exotic orange] coordinates {(0.2,0.125)};
+					
+					\node at (axis cs:-5,0.8) {$\ket{\alpha_1}$};
+					\node at (axis cs:5.4,2.5) {$\ket{\alpha_2}$};
+					\node at (axis cs:-1.3,0.9) {$\ket{\beta_1}$};
+					\node at (axis cs:1.4,-0.7) {$\ket{\beta_2}$};
 		
-					\draw[-Latex, gray] (axis cs:1.5,1.5) -- (axis cs:0.2,0.2);
-					\draw[-Latex, gray] (axis cs:-1.5,0.5) -- (axis cs:-0.2,0.07);
+					\draw[-Latex, dashed, thick] (axis cs:-5,-0.5) -- (axis cs:-0.25,-0.025);
+					\draw[-Latex, dashed, thick] (axis cs:4,2.5) -- (axis cs:0.2,0.125);
 				\end{axis}
 			\end{tikzpicture}
-			\caption{Phase space diagram of coherent states including variance and examples for measurement outcomes.}
+			\caption{Phase space diagram of transmitted and received coherent states with mean (dots) and variances (opaque circles).}
 		\end{figure}
 	\end{frame}
 	
-	\section{Coherent transmission system}
-	
-	\begin{frame}{Overview}
+	\begin{frame}{Continuous-variable QKD using continuous-time coherent states}
 		\begin{figure}
 			\begin{tikzpicture}[
-				node distance=12mm,
-				arrow/.style={very thick, -Latex},
-				block/.style={draw, very thick, minimum height=12mm, minimum width=28mm, align=center},
+				var/.style={draw, very thick, fill opacity=0.25, circle, minimum width=45mm},
 			]
-				\node[block] (source) {Information\\source};
-				\node[block, above=of source] (transmitter) {Transmitter};
-				\node[block, right=26mm of transmitter] (channel) {Channel};
-				\node[block, right=26mm of channel] (receiver) {Receiver};
-				\node[block, below=of receiver] (destination) {Information\\destination}; 
+				\begin{axis}[
+					height=6cm,
+					width=\linewidth,
+					clip=false,
+					axis lines=center,
+					axis equal image,
+					axis line style=thick,
+					xlabel={$\hat{X}(\vartheta)$},
+					ylabel={$\hat{X}(\vartheta+\pi/2)$},
+					ticks=none,
+					xmin=-6,
+					xmax=+6.5,
+					ymin=-1.2,
+					ymax=+3,
+					axis line style={thick},
+					x label style={anchor=north},
+					y label style={anchor=south},
+				]
+					\begin{scope}[blend group=soft light]					
+						\draw[var, fill=exotic green] (axis cs:-5,-0.5) circle (1);
+						\draw[var, fill=exotic red] (axis cs:4,2.5) circle (1);
+					\end{scope}
+
+					\addplot[very thick, mark=*, exotic green] coordinates {(-5,-0.5)};
+					\addplot[very thick, mark=*, exotic red] coordinates {(4,2.5)};
+					
+					\node at (axis cs:-5,0.8) {$\ket{\alpha(t)}$};
+					\node at (axis cs:4,1.2) {$\ket{\alpha(t+T_s)}$};
+					\draw[-Latex, dashed, thick] (axis cs:-5,-0.5) -- (axis cs:4,2.5);
+				\end{axis}
+			\end{tikzpicture}
+			\caption{Phase space diagram of continuous-time coherent states with mean (dots) and variances (opaque circles) at two time instances.}
+		\end{figure}
+	\end{frame}
+	
+	\section{Coherent state transmitter}
+	
+	\begin{frame}{Electro-optical setup}
+		\begin{figure}
+			\begin{tikzpicture}[
+				node distance=15mm,
+		        block/.style={draw, very thick, minimum height=10mm, minimum width=20mm},
+		        arrow/.style={-Latex},
+			]
+				\coordinate (src);
+				\node[block, right=of src] (tx) {Transmitter};
+				\node[block, right=1.3cm of tx] (ch) {Channel};
+				\node[block, right=1.3cm of ch] (rx) {Receiver};
+				\coordinate[right=of rx] (dst);
 				
-				\draw[arrow] (source) -- (transmitter) node[midway, left] {$\left\{\alpha_n\right\}_{n\in I}$};
-				\draw[arrow] (transmitter) -- (channel) node[midway, above] {$\Re\left\{\alpha(t)e^{-i\omega_c t}\right\}$};
-				\draw[arrow] (channel) -- (receiver) node[midway, above] {$\Re\left\{\beta(t)e^{-i\omega_c t}\right\}$};
-				\draw[arrow] (receiver) -- (destination) node[midway, right] {$\left\{\beta_n\right\}_{n\in I}$};;
+				\draw[arrow] (src) -- (tx) node[midway, above] {$\left\{\alpha_n\right\}_{n\in I}$};
+				\draw[arrow] (tx) -- (ch) node[midway, above] {$\ket{\alpha(t)}$};
+				\draw[arrow] (ch) -- (rx) node[midway, above] {$\ket{\beta(t)}$};
+				\draw[arrow] (rx) -- (dst) node[midway, above] {$\left\{\beta_n\right\}_{n\in I}$};
 			\end{tikzpicture}
-			\caption{Coherent transmission system correlating an information destination with an information source.}
+			\caption{Foobar}
 		\end{figure}
 	\end{frame}
 	
-	\begin{frame}{Optical transmitter setups}
+	\begin{frame}{Signal processing pipeline}
 		\begin{figure}
-			\centering
-			\includegraphics{figures/coherent-transmitter}
-			\caption{foo}
-		\end{figure}
-	\end{frame}
+	\begin{tikzpicture}[
+		node distance=8mm,
+	]
+		\begin{scope}
+			\node (in) {$\alpha[n]$};
+			\node (up) [twoportshape, right=of in, t={$\uparrow k$}] {};
+			\node (rrc) [twoportshape, right=of up, t=RRC] {};
+			\node (real) [twoportsplitshape, circuitikz/t1={$\Re$}, circuitikz/t2={$\Im$}, right=of rrc] {};
+			\node (noop) [right=of real] {};
 	
-	\begin{frame}{Optical receiver setups}
-		\begin{figure}
-			\centering
-			\includegraphics{figures/coherent-receiver-active}
-			\caption{foo}
-		\end{figure}
-	\end{frame}
+			\node (dacx) [dacshape, above=of noop] {};
+			\node (lowx) [lowpassshape, right=of dacx] {};
+			\node (mixx) [mixer, right=of lowx] {};
 	
-	\begin{frame}{Signal processing}
-		\begin{figure}
-			\begin{tikzpicture}[
-					node distance=20pt,
-			]
-				\node (in) {$z(t)$};
-				\node (mixa) [mixer, right=of in] {};
-				\node (low) [lowpassshape, right=of mixa] {};
-				\node (osca) [below=of mixa] {$\cos(\omega_ct+\vartheta)$};
-				\node (adc) [adcshape, right=of low] {};
-				\node (mixd) [mixer, right=of adc] {};
-				\node (oscd) [below=of mixd] {$\exp(i\omega_it)$};
-				\node (down1) [twoportshape, t={$\downarrow l$}, right=of mixd] {};
-				\node (rrc) [twoportshape, t={RRC}, right=of down1] {};
-				\node (down2) [twoportshape, t={$\downarrow k$}, right=of rrc] {};
-				\node (out) [right=of down2] {$\beta[n]$};
+			\node (dacp) [dacshape, below=of noop] {};
+			\node (lowp) [lowpassshape, right=of dacp] {};
+			\node (mixp) [mixer, right=of lowp] {};
 	
-				\draw[-Latex] (in) -- (mixa.west);
-				\draw[-Latex] (mixa.east) -- (low.west);
-				\draw[-Latex] (low.east) -- (adc.west);
-				\draw[-Latex] (adc.east) -- (mixd.west);
-				\draw[-Latex] (mixd.east) -- (down1.west);
-				\draw[-Latex] (down1.east) -- (rrc.west);
-				\draw[-Latex] (rrc.east) -- (down2.west);
-				\draw[-Latex] (down2.east) -- (out.west);
+			\node (split) [twoportsplitshape, circuitikz/t1={\ \SI{90}{\degree}}, circuitikz/t2={\SI{0}{\degree}}] at (mixx.south|-real.east) {};
+			\node (osc) [left=of split] {$\sqrt{2}\sin(\omega_ct+\vartheta)$};
+			\node (add) [adder, right=of split] {};
+	
+			\draw[-Latex] (in) -- (up);
+			\draw[-Latex] (up) -- (rrc);
+			\draw[-Latex] (rrc) -- (real);
+			\draw[-Latex] (osc) -- (split);
+	
+			\draw[-Latex] (real.north) -- (real.north|-dacx.west) -- (dacx.west);
+			\draw[-Latex] (dacx) -- (lowx);
+			\draw[-Latex] (lowx) -- (mixx.west);
+			\draw[Latex-] (mixx.south) -- (split.north);
+			\draw[-Latex] (mixx.east) -- (mixx.east-|add.north) -- (add.north);
+	
+			\draw[-Latex] (real.south) -- (real.south|-dacp.west) -- (dacp.west);
+			\draw[-Latex] (dacp) -- (lowp);
+			\draw[-Latex] (lowp) -- (mixp.west);
+			\draw[Latex-] (mixp.north) -- (split.south);
+			\draw[-Latex] (mixp.east) -- (mixp.east-|add.south) -- (add.south);			
+		\end{scope}
 		
-				\draw[-Latex] (osca.north) -- (mixa.south);
-				\draw[-Latex] (oscd.north) -- (mixd.south);
-			\end{tikzpicture}
+		\begin{scope}
+			\node (channel in) [bandpassshape, right=22.5mm of add] {};
+			\node (channel add) [adder, below=of channel in] {};
+			\node (channel out) [bandpassshape, below=of channel add] {};
+			\node (channel noise) [left=of channel add] {AWGN};
+			
+			\draw[-Latex] (channel in.south) -- (channel add.north);
+			\draw[-Latex] (channel add.south) -- (channel out.north);
+			\draw[-Latex] (channel noise) -- (channel add.west);
+		\end{scope}
+		
+		\begin{scope}
+			\node (mixa) [mixer, left=of channel out] {};
+			\node (low) [lowpassshape, left=of mixa] {};
+			\node (osca) [below=of mixa] {$\cos(\omega_ct+\vartheta)$};
+			\node (adc) [adcshape, left=of low] {};
+			\node (mixd) [mixer, left=of adc] {};
+			\node (oscd) [below=of mixd] {$\exp(i\omega_it)$};
+			\node (down1) [twoportshape, t={$\downarrow l$}, left=of mixd] {};
+			\node (rrc) [twoportshape, t={RRC}, left=of down1] {};
+			\node (down2) [twoportshape, t={$\downarrow k$}, left=of rrc] {};
+			\node (out) [left=of down2] {$\beta[n]$};
+	
+			\draw[-Latex] (mixa.west) -- (low.east);
+			\draw[-Latex] (low.west) -- (adc.east);
+			\draw[-Latex] (adc.west) -- (mixd.east);
+			\draw[-Latex] (mixd.west) -- (down1.east);
+			\draw[-Latex] (down1.west) -- (rrc.east);
+			\draw[-Latex] (rrc.west) -- (down2.east);
+			\draw[-Latex] (down2.west) -- (out);
+	
+			\draw[-Latex] (osca.north) -- (mixa.south);
+			\draw[-Latex] (oscd.north) -- (mixd.south);
+		\end{scope}
+		
+		\draw[-Latex] (add.east) -- (channel in.west);
+		\draw[-Latex] (channel out.west) -- (mixa.east);
+	\end{tikzpicture}
 		\end{figure}
 	\end{frame}
 	
+	\begin{frame}{Pulse-shaping}
+		\begin{columns}[c, onlytextwidth]
+			\column{0.5\textwidth}
+			\begin{figure}
+				\begin{tikzpicture}
+					\begin{groupplot}[
+						group style={
+							group name=plot,
+							group size=1 by 4,
+							vertical sep=1mm,
+						},
+						ylabel style={align=center},
+						grid=major,
+						width=\linewidth,
+						height=27mm,
+						cycle list name=exotic,
+						axis line style={thick},
+					]
+						\nextgroupplot[
+							xmin=10,
+							xmax=20,
+							%xlabel={Symbol index $km$},
+							%xlabel near ticks,
+							%xticklabel pos=top,
+							ylabel={$\alpha[km]$},
+						]
+						\addplot+[
+							very thick,
+							ycomb,
+							mark=o,
+							restrict expr to domain={\thisrow{c1}}{10:20},
+						] plot table[col sep=comma] {./data/rand-time-tx-sym-real.csv};
+						\addplot+[
+							very thick,
+							ycomb,
+							mark=x,
+							restrict expr to domain={\thisrow{c1}}{10:20},
+						] plot table[col sep=comma] {./data/rand-time-tx-sym-imag.csv};
+						\nextgroupplot[
+							xmin=10,
+							xmax=20,
+							xlabel={},
+							xticklabels={},
+							ylabel={$\rho[m]$},
+						]
+						\addplot+[
+							very thick,
+							ycomb,
+							mark=o,
+							restrict expr to domain={\thisrow{c1}}{10:20},
+						] plot table[col sep=comma] {./data/rand-time-tx-up-real.csv};
+						\addplot+[
+							very thick,
+							ycomb,
+							mark=x,
+							restrict expr to domain={\thisrow{c1}}{10:20},
+						] plot table[col sep=comma] {./data/rand-time-tx-up-imag.csv};
+						\nextgroupplot[
+							xmin=10,
+							xmax=20,
+							xlabel={},
+							xticklabels={},
+							ylabel={$\gamma[m]$},
+						]
+						\addplot+[
+							very thick,
+							ycomb,
+							mark=o,
+							restrict expr to domain={\thisrow{c1}}{10:20},
+						] plot table[col sep=comma] {./data/rand-time-tx-rrc-real.csv};
+						\addplot+[
+							very thick,
+							ycomb,
+							mark=x,
+							restrict expr to domain={\thisrow{c1}}{10:20},
+						] plot table[col sep=comma] {./data/rand-time-tx-rrc-imag.csv};
+						\nextgroupplot[
+							xmin=10,
+							xmax=20,
+							xlabel={Signal time $t/T_s$},
+							ylabel={$\alpha(t)$},
+						]
+						\addplot+[
+							very thick,
+							no markers,
+							restrict expr to domain={\thisrow{c1}}{10:20},
+						] plot table[col sep=comma, y expr=\thisrow{c2}*4] {./data/rand-time-tx-lp-real.csv};
+						\addplot+[
+							very thick,
+							no markers,
+							restrict expr to domain={\thisrow{c1}}{10:20},
+						] plot table[col sep=comma] {./data/rand-time-tx-lp-imag.csv};
+					\end{groupplot}
+				\end{tikzpicture}
+			\end{figure}
+
+			\column{0.5\textwidth}
+			\begin{figure}
+				\begin{tikzpicture}
+					\begin{groupplot}[
+						group style={
+							group name=plot,
+							group size=1 by 5,
+							xlabels at=edge bottom,
+							xticklabels at=edge bottom,
+							vertical sep=1mm,
+						},
+						grid=major,
+						width=\linewidth,
+						height=25mm,
+						xlabel={Frequency $f/f_s$},
+			%			yticklabels={},
+						%ylabel={Power spectral\\density (\si{\decibel})},
+						%ylabel style={align=center},
+						axis line style={thick},
+						cycle list name=exotic,
+					]
+						\nextgroupplot[
+							%title={$\alpha[km],x[km]$ encoding symbols},
+							xmin=-4,
+							xmax=4,
+							xtick distance=0.5,
+							ymin=-60,
+							ymax=5,
+						]
+						\addplot+[
+							very thick,
+							no markers,
+						] plot table[col sep=comma] {./data/rand-freq-tx-sym.csv};
+						\nextgroupplot[
+							%title={$\rho[m],r[m]$ after upsampling $\alpha[km],x[km]$},
+							xmin=-4,
+							xmax=4,
+							xtick distance=0.5,
+							ymin=-60,
+							ymax=5,
+			%				ylabel={Upsampling\\$\rho[m],r[m]$},
+						]
+						\addplot+[
+							very thick,
+							no markers,
+						] plot table[col sep=comma] {./data/rand-freq-tx-up.csv};
+						\nextgroupplot[
+							%title={$\gamma[m],q[m]$ after pulse-shaping $\rho[m],r[m]$},
+							xmin=-4,
+							xmax=4,
+							xtick distance=0.5,
+							ymin=-60,
+							ymax=5,
+			%				ylabel={Pulse-shaping\\$\gamma[m],q[m]$},
+						]
+						\addplot+[
+							very thick,
+							no markers,
+						] plot table[col sep=comma] {./data/rand-freq-tx-rrc.csv};
+						\nextgroupplot[
+							%title={$\gamma(t),q(t)$ after analog converting $\gamma[m],q[m]$},
+							xmin=-4,
+							xmax=4,
+							xtick distance=0.5,
+							ymin=-60,
+							ymax=5,
+							%ylabel={Analog-conv.\\$\gamma(t),q(t)$},
+						]
+						\addplot+[
+							very thick,
+							no markers,
+						] plot table[col sep=comma] {./data/rand-freq-tx-dac.csv};
+						\nextgroupplot[
+							%title={$\alpha(t),x(t)$ after anti-aliasing $\gamma(t),q(t)$},
+							xmin=-4,
+							xmax=4,
+							xtick distance=0.5,
+							ymin=-60,
+							ymax=5,
+							%ylabel={Anti-aliasing\\$\alpha(t),x(t)$},
+						]
+						\addplot+[
+							very thick,
+							no markers,
+						] plot table[col sep=comma] {./data/rand-freq-tx-lp.csv};
+					\end{groupplot}
+				\end{tikzpicture}
+			\end{figure}
+		\end{columns}
+	\end{frame}
+		
 	\begin{frame}{Upconversion}
 		
 	\end{frame}
+	
+	\begin{frame}{In-phase and quadrature modulator}
+		
+	\end{frame}
+	
+	\section{Coherent state receiver}
 	
 	\begin{frame}{Downconversion}
 		
 	\end{frame}
 	
-	\section{Problem and proposed solution}
-	
-	\begin{frame}{Problem statement}
-		\begin{columns}[c, onlytextwidth]
-			\column{0.4\textwidth}
-			\begin{itemize}
-			    \item Foo
-			    \item Bar
-			    \item Baz
-			\end{itemize}
-			
-			\column{0.4\textwidth}
-			\begin{figure}
-				\caption{Block diagram of our approach.}
-			\end{figure}
-		\end{columns}
+	\begin{frame}{Balanced detector}
+		
 	\end{frame}
 	
 	\section{Conclusion and outlook}
 	
-	\begin{frame}
-		\begin{center}
-			\textbf{Postlude}
-			
-			How does light interact with matter?
-		\end{center}
+	\begin{frame}{Conclusion and outlook}
 	\end{frame}
 	
 	\appendix
@@ -480,253 +600,6 @@
 	\end{tikzpicture}
 		\caption{Block diagram of classical post-processing pipeline.}
 		\end{figure}
-	\end{frame}
-	
-	% I am a little theory fanboy
-	% I think their general methods are often underappreciated
-	% However, to me their research problems are too far away from the experiment and self-centered
-	\section{Continuous-mode quantum theory of light}
-	
-	% Lagrangian from first principles (gauge symmetry, vector field, Lorentz scalar, order of derivatives)
-	% Field-theoretic framework (energy-momentum tensor, angular momentum tensor, conservation laws, ...)
-	% Covariant Maxwell equations follow directly
-	\begin{frame}{Maxwell Lagrangian and equations}
-		The Lagrangian density for the Maxwell field $A^\mu(t,\vb{x})$
-		\begin{equation}
-			\mathcal{L}
-			=
-			-
-			\frac{1}{4}
-			F_{\mu\nu}
-			F^{\mu\nu}
-			+
-			A_\mu j^\mu
-			,
-		\end{equation}
-		wherein
-		\begin{align}
-			F_{\mu\nu}
-			&=
-			\partial_\mu
-			A_\nu
-			-
-			\partial_\nu
-			A_\mu
-			&
-			\tilde{F}^{\mu\nu}
-			&=
-			\frac{1}{2}
-			\varepsilon^{\mu\nu\rho\sigma}
-			F_{\rho\sigma}
-		\end{align}
-		and employing variational calusu and the Bianchi identity lead us to the covariant formulation of the Maxwell equations
-		\begin{align}
-			\partial_\mu
-			\tilde{F}^{\mu\nu}
-			&=
-			0
-			&
-			\partial_\mu
-			F^{\mu\nu}
-			&=
-			j^\mu
-			.
-		\end{align}
-	\end{frame}
-
-	% interpretation of temporal and Coulomb gauge
-	% alternative to Lorenz gauge, we choose a gauge transform to remove non-transverse DOFs
-	% expectation value of the Maxwell field operator w.r.t. a coherent state
-	% Coulomb gauge in momentum space requires polarization vectors to be orthogonal to momentum vector
-	\begin{frame}{Transverse plane-wave expansion}
-		\begin{columns}[c, onlytextwidth]
-			\column{0.5\textwidth}
-			Temporal and Lorenz gauge
-			\begin{equation}
-				A_0
-				=
-				0
-				\quad
-				\text{and}
-				\quad
-				\partial_i
-				A^i
-				=
-				0
-			\end{equation}
-			the field becomes transverse and the equation of motion reduces to a relativistic wave equation
-			\begin{equation}
-				\partial_t^2
-				\vb{A}
-				=
-				\laplace
-				\vb{A}
-			\end{equation}
-			\begin{equation}
-				\vb{A}(t,\vb{x})
-				=
-				\int\frac{\dd[4]{p}}{(2\pi)^4}
-				\vb{A}(p_0,\vb{p})
-				e^{-ip_0t+i\vb{p}\vdot\vb{x}}
-			\end{equation}
-			
-			\column{0.5\textwidth}
-			\begin{equation}
-				p_0
-				=
-				\omega(\vb{p})
-				=
-				\norm{\vb{p}}
-			\end{equation}
-			\begin{equation}
-				\vb{A}(t,\vb{x})
-				=
-				\int\frac{\dd[3]{p}}{(2\pi)^3\sqrt{2\omega(\vb{p})}}
-				\vb{A}\!\left(\omega(\vb{p}),\vb{p}\right)
-				+
-				\text{c.c.}
-			\end{equation}
-			\begin{equation}
-				\vb{A}\!\left(\omega(\vb{p}),\vb{p}\right)
-				=
-				\sum_{\lambda=1,2}
-				a_\lambda(\vb{p})
-				\hat{a}_\lambda(\vb{p})
-				\vu{e}_\lambda(\vb{p})
-			\end{equation}
-		\end{columns}
-	\end{frame}
-	
-
-
-	\begin{frame}{Canonical quantization in the Coulomb gauge}
-		\begin{align}
-			\vu{A}^{(-)}(t,\vb{x})
-			&=
-			\sum_{\lambda=1,2}
-			\int\frac{\dd[3]{p}}{(2\pi)^3\sqrt{2\omega(\vb{p})}}
-			\hat{a}_\lambda(\vb{p})
-			\vu{e}_\lambda(\vb{p})
-			e^{-i\omega(\vb{p})t+i\vb{p}\vdot\vb{x}}
-			\\
-			\vu{E}^{(-)}(t,\vb{x})
-			&=
-			-i
-			\sum_{\lambda=1,2}
-			\int\frac{\dd[3]{p}}{(2\pi)^3\sqrt{2\omega(\vb{p})}}
-			\omega(\vb{p})
-			\hat{a}_\lambda(\vb{p})
-			\vu{e}_\lambda(\vb{p})
-			e^{-i\omega(\vb{p})t+i\vb{p}\vdot\vb{x}}
-		\end{align}
-		\begin{align}
-			\comm{\hat{A}_i(t,\vb{x})}{\hat{E}_j(t,\vb{y})}
-			&=
-			-i\delta_{\perp ij}^{(3)}(\vb{x}-\vb{y})
-			\\
-			\comm{\hat{A}_i(t,\vb{x})}{\hat{A}_j(t,\vb{y})}
-			&=
-			\comm{\hat{E}_i(t,\vb{x})}{\hat{E}_j(t,\vb{y})}
-			=
-			0
-		\end{align}
-		\begin{align}
-			\hat{H}
-			&=
-			\sum_{\lambda=1,2}
-			\int\frac{\dd[3]{p}}{(2\pi)^3}
-			\omega(\vb{p})
-			\hat{a}_\lambda^\dagger(\vb{p})
-			\hat{a}_\lambda(\vb{p})
-			&
-			\vu{P}
-			&=
-			\sum_{\lambda=1,2}
-			\int\frac{\dd[3]{p}}{(2\pi)^3}
-			\vb{p}
-			\hat{a}_\lambda^\dagger(\vb{p})
-			\hat{a}_\lambda(\vb{p})
-		\end{align}
-	\end{frame}
-	
-	\begin{frame}{Number state}
-		\begin{equation}
-			\begin{split}
-				\ket{n_f}
-				=
-				\frac{1}{\sqrt{n!}}
-				\hat{A}^{(+)}[f]^n
-				\ket{0}
-				&=
-				\frac{1}{\sqrt{n!}}
-				\left(
-					\int\dd[4]{x}
-					f(t,\vb{x})
-					\hat{A}^{(+)}(t,\vb{x})
-				\right)^n
-				\ket{0}
-				\\
-				&=
-				\frac{1}{\sqrt{n!}}
-				\left(
-					\int\frac{\dd[3]{p}}{(2\pi)^3\sqrt{2\omega(\vb{p})}}
-					f\!\left(\omega(\vb{p}),\vb{p}\right)
-					\hat{A}^{(+)}(t,\vb{x})
-					\hat{a}^\dagger(\vb{p})
-				\right)^n
-				\ket{0}
-			\end{split}
-		\end{equation}
-		\begin{equation}
-			\braket{1_f}{1_f}
-			=
-			\int\frac{\dd[3]{p}}{(2\pi)^3}
-			\abs*{\frac{f\!\left(\omega(\vb{p}),\vb{p}\right)}{\sqrt{2\omega(\vb{p})}}}^2
-			=
-			1
-		\end{equation}
-		\begin{equation}
-			\bra{n_f}
-			\hat{H}
-			\ket{n_f}
-			=
-			n
-			\int\frac{\dd[3]{p}}{(2\pi)^3}
-			\omega(\vb{p})
-			\abs*{\frac{f\!\left(\omega(\vb{p}),\vb{p}\right)}{\sqrt{2\omega(\vb{p})}}}^2
-		\end{equation}
-	\end{frame}
-
-	\begin{frame}{Coherent state}
-		\begin{equation}
-			\hat{\alpha}
-			=
-			\hat{D}\left[\alpha\right]
-			\ket{0}
-		\end{equation}
-		\begin{equation}
-			\begin{split}
-				\hat{D}\left[\alpha\right]
-				&=
-				\exp\biggl\{
-					\hat{A}^{(+)}[\alpha]
-					-
-					\hat{A}^{(-)}[\alpha^*]
-				\biggr\}
-				\\
-				&=
-				\exp\left\{
-					\int\frac{\dd[3]{p}}{(2\pi)^3\sqrt{2\omega(\vb{p})}}
-					\left[
-						\alpha(\vb{p})
-						\hat{a}^\dagger(\vb{p})
-						-
-						\alpha(\vb{p})^*
-						\hat{a}(\vb{p})
-					\right]
-				\right\}
-			\end{split}
-		\end{equation}
 	\end{frame}
 
 \end{document}
