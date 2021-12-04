@@ -32,6 +32,8 @@
 \definecolor{exotic blue}{RGB}{67,132,161}
 \definecolor{exotic red}{RGB}{250,86,86}
 
+\DeclareSIUnit{\arbitraryunit}{arb. unit}
+
 \title{A theoretical framework for CV-QKD}
 \date{\today}
 \author{Bodo Kaiser}
@@ -123,7 +125,7 @@
 			\begin{tikzpicture}[
 				node distance=5mm,
 				arrow/.style={very thick, -Latex},
-				block/.style={draw, very thick, minimum width=28mm, minimum height=10mm},		
+				block/.style={draw, very thick, minimum width=28mm, minimum height=10mm},
 			]
 				\node[block] (alice) {Alice};
 				\node[block, right=14mm of alice] (eve) {Eve};
@@ -249,296 +251,242 @@
 	
 	\section{Coherent state transmitter}
 	
-	\begin{frame}{Electro-optical setup}
+	\begin{frame}{Software-defined transmitter architecture}
 		\begin{figure}
 			\begin{tikzpicture}[
 				node distance=15mm,
-		        block/.style={draw, very thick, minimum height=10mm, minimum width=20mm},
-		        arrow/.style={-Latex},
+				arrow/.style={very thick, -Latex},
+				block/.style={draw, very thick, minimum width=18mm, minimum height=12mm},
 			]
-				\coordinate (src);
-				\node[block, right=of src] (tx) {Transmitter};
-				\node[block, right=1.3cm of tx] (ch) {Channel};
-				\node[block, right=1.3cm of ch] (rx) {Receiver};
-				\coordinate[right=of rx] (dst);
+				\coordinate (in) at (0,0);
+				\node (dsp) [block, right=of in] {DSP};
+				\node (dac) [block, right=of dsp] {DAC};
+				\node (mod) [block, right=of dac] {MOD};
+				\coordinate[right=of mod] (out);
 				
-				\draw[arrow] (src) -- (tx) node[midway, above] {$\left\{\alpha_n\right\}_{n\in I}$};
-				\draw[arrow] (tx) -- (ch) node[midway, above] {$\ket{\alpha(t)}$};
-				\draw[arrow] (ch) -- (rx) node[midway, above] {$\ket{\beta(t)}$};
-				\draw[arrow] (rx) -- (dst) node[midway, above] {$\left\{\beta_n\right\}_{n\in I}$};
+				\draw[arrow] (in) -- (dsp) node[midway, above] {$\left\{\alpha_n\right\}_{n\in I}$};
+				\draw[arrow] ([yshift=4mm]dsp.east) -- ([yshift=4mm]dac.west) node[midway, above] {$x[m]$};
+				\draw[arrow] ([yshift=-4mm]dsp.east) -- ([yshift=-4mm]dac.west) node[midway, above] {$p[m]$};
+				\draw[arrow] ([yshift=4mm]dac.east) -- ([yshift=4mm]mod.west) node[midway, above] {$x(t)$};
+				\draw[arrow] ([yshift=-4mm]dac.east) -- ([yshift=-4mm]mod.west) node[midway, above] {$p(t)$};
+				\draw[arrow] (mod) -- (out) node[midway, above] {$\ket{\alpha(t)}$};
 			\end{tikzpicture}
-			\caption{Foobar}
+			\caption{Block diagram of the software-defined transmitter architecture.}
 		\end{figure}
-	\end{frame}
-	
-	\begin{frame}{Signal processing pipeline}
+		
 		\begin{figure}
-	\begin{tikzpicture}[
-		node distance=8mm,
-	]
-		\begin{scope}
-			\node (in) {$\alpha[n]$};
-			\node (up) [twoportshape, right=of in, t={$\uparrow k$}] {};
-			\node (rrc) [twoportshape, right=of up, t=RRC] {};
-			\node (real) [twoportsplitshape, circuitikz/t1={$\Re$}, circuitikz/t2={$\Im$}, right=of rrc] {};
-			\node (noop) [right=of real] {};
-	
-			\node (dacx) [dacshape, above=of noop] {};
-			\node (lowx) [lowpassshape, right=of dacx] {};
-			\node (mixx) [mixer, right=of lowx] {};
-	
-			\node (dacp) [dacshape, below=of noop] {};
-			\node (lowp) [lowpassshape, right=of dacp] {};
-			\node (mixp) [mixer, right=of lowp] {};
-	
-			\node (split) [twoportsplitshape, circuitikz/t1={\ \SI{90}{\degree}}, circuitikz/t2={\SI{0}{\degree}}] at (mixx.south|-real.east) {};
-			\node (osc) [left=of split] {$\sqrt{2}\sin(\omega_ct+\vartheta)$};
-			\node (add) [adder, right=of split] {};
-	
-			\draw[-Latex] (in) -- (up);
-			\draw[-Latex] (up) -- (rrc);
-			\draw[-Latex] (rrc) -- (real);
-			\draw[-Latex] (osc) -- (split);
-	
-			\draw[-Latex] (real.north) -- (real.north|-dacx.west) -- (dacx.west);
-			\draw[-Latex] (dacx) -- (lowx);
-			\draw[-Latex] (lowx) -- (mixx.west);
-			\draw[Latex-] (mixx.south) -- (split.north);
-			\draw[-Latex] (mixx.east) -- (mixx.east-|add.north) -- (add.north);
-	
-			\draw[-Latex] (real.south) -- (real.south|-dacp.west) -- (dacp.west);
-			\draw[-Latex] (dacp) -- (lowp);
-			\draw[-Latex] (lowp) -- (mixp.west);
-			\draw[Latex-] (mixp.north) -- (split.south);
-			\draw[-Latex] (mixp.east) -- (mixp.east-|add.south) -- (add.south);			
-		\end{scope}
+			\begin{tikzpicture}[
+				line width=0.2mm,
+				node distance=8mm,
+				arrow/.style={very thick, -Latex},
+			]
+				\node (in) {$\alpha[n]$};
+				\node (up) [twoportshape, right=of in, t={$\uparrow k$}] {};
+				\node (rrc) [twoportshape, right=of up, t=RRC] {};
+				\node (real) [twoportsplitshape, circuitikz/t1={$\Re$}, circuitikz/t2={$\Im$}, right=of rrc] {};
+
+				\node (dacp) [dacshape, right=of real] {};
+				\node (lowp) [lowpassshape, right=of dacp] {};
+				\node (outp) [right=of lowp] {$p(t)$};
+				
+				\node (dacx) [dacshape, above=5mm of dacp] {};
+				\node (lowx) [lowpassshape, right=of dacx] {};
+				\node (outx) [right=of lowx] {$x(t)$};
+				
+				\draw[arrow] (in) -- (up);
+				\draw[arrow] (up) -- (rrc);
+				\draw[arrow] (rrc) -- (real);
 		
-		\begin{scope}
-			\node (channel in) [bandpassshape, right=22.5mm of add] {};
-			\node (channel add) [adder, below=of channel in] {};
-			\node (channel out) [bandpassshape, below=of channel add] {};
-			\node (channel noise) [left=of channel add] {AWGN};
-			
-			\draw[-Latex] (channel in.south) -- (channel add.north);
-			\draw[-Latex] (channel add.south) -- (channel out.north);
-			\draw[-Latex] (channel noise) -- (channel add.west);
-		\end{scope}
+				\draw[arrow] (real.north) -- (real.north|-dacx.west) -- (dacx.west);
+				\draw[arrow] (dacx) -- (lowx);
+				\draw[arrow] (lowx) -- (outx);
 		
-		\begin{scope}
-			\node (mixa) [mixer, left=of channel out] {};
-			\node (low) [lowpassshape, left=of mixa] {};
-			\node (osca) [below=of mixa] {$\cos(\omega_ct+\vartheta)$};
-			\node (adc) [adcshape, left=of low] {};
-			\node (mixd) [mixer, left=of adc] {};
-			\node (oscd) [below=of mixd] {$\exp(i\omega_it)$};
-			\node (down1) [twoportshape, t={$\downarrow l$}, left=of mixd] {};
-			\node (rrc) [twoportshape, t={RRC}, left=of down1] {};
-			\node (down2) [twoportshape, t={$\downarrow k$}, left=of rrc] {};
-			\node (out) [left=of down2] {$\beta[n]$};
-	
-			\draw[-Latex] (mixa.west) -- (low.east);
-			\draw[-Latex] (low.west) -- (adc.east);
-			\draw[-Latex] (adc.west) -- (mixd.east);
-			\draw[-Latex] (mixd.west) -- (down1.east);
-			\draw[-Latex] (down1.west) -- (rrc.east);
-			\draw[-Latex] (rrc.west) -- (down2.east);
-			\draw[-Latex] (down2.west) -- (out);
-	
-			\draw[-Latex] (osca.north) -- (mixa.south);
-			\draw[-Latex] (oscd.north) -- (mixd.south);
-		\end{scope}
-		
-		\draw[-Latex] (add.east) -- (channel in.west);
-		\draw[-Latex] (channel out.west) -- (mixa.east);
-	\end{tikzpicture}
+				\draw[arrow] (real.east) -- (real.east|-dacp.west) -- (dacp.west);
+				\draw[arrow] (dacp) -- (lowp);
+				\draw[arrow] (lowp) -- (outp);
+			\end{tikzpicture}
+			\caption{Block diagram of the digital signal processing for symbol encoding.}
+		\end{figure}
+	\end{frame}
+
+	\begin{frame}{Symbol-encoding in the time domain}
+		\begin{figure}
+			\begin{tikzpicture}
+				\begin{groupplot}[
+					group style={
+						group name=plot,
+						group size=2 by 4,
+						vertical sep=2mm,
+						horizontal sep=26mm,
+					},
+					xmin=10,
+					xmax=20,
+					ylabel style={align=center},
+					grid=major,
+					width=0.44\linewidth,
+					height=37mm,
+					cycle list name=exotic,
+					axis line style={thick},
+				]
+					\nextgroupplot[
+						xticklabels={},
+						ylabel={Ampl. $\alpha[km]$\\(\si{\arbitraryunit})},
+					]
+					\addplot+[
+						very thick,
+						ycomb,
+						mark=o,
+						restrict expr to domain={\thisrow{c1}}{10:20},
+					] plot table[col sep=comma] {./data/rand-time-tx-sym-real.csv};
+					\addplot+[
+						very thick,
+						ycomb,
+						mark=x,
+						restrict expr to domain={\thisrow{c1}}{10:20},
+					] plot table[col sep=comma] {./data/rand-time-tx-sym-imag.csv};
+					\nextgroupplot[
+						xticklabels={},
+						ylabel={Ampl. $\gamma[m]$\\(\si{\arbitraryunit})},
+					]
+					\addplot+[
+						very thick,
+						ycomb,
+						mark=o,
+						restrict expr to domain={\thisrow{c1}}{10:20},
+					] plot table[col sep=comma] {./data/rand-time-tx-rrc-real.csv};
+					\addplot+[
+						very thick,
+						ycomb,
+						mark=x,
+						restrict expr to domain={\thisrow{c1}}{10:20},
+					] plot table[col sep=comma] {./data/rand-time-tx-rrc-imag.csv};
+					\nextgroupplot[
+						ylabel={Ampl. $\rho[m]$\\(\si{\arbitraryunit})},
+						xlabel={Symbol index $km$},
+					]
+					\addplot+[
+						very thick,
+						ycomb,
+						mark=o,
+						restrict expr to domain={\thisrow{c1}}{10:20},
+					] plot table[col sep=comma] {./data/rand-time-tx-up-real.csv};
+					\addplot+[
+						very thick,
+						ycomb,
+						mark=x,
+						restrict expr to domain={\thisrow{c1}}{10:20},
+					] plot table[col sep=comma] {./data/rand-time-tx-up-imag.csv};
+					\nextgroupplot[
+						xlabel={Signal time $t/T_s$},
+						ylabel={Ampl. $\alpha(t)$\\(\si{\volt})},
+					]
+					\addplot+[
+						very thick,
+						no markers,
+						restrict expr to domain={\thisrow{c1}}{10:20},
+					] plot table[col sep=comma, y expr=\thisrow{c2}*4] {./data/rand-time-tx-lp-real.csv};
+					\addplot+[
+						very thick,
+						no markers,
+						restrict expr to domain={\thisrow{c1}}{10:20},
+					] plot table[col sep=comma, y expr=\thisrow{c2}*4] {./data/rand-time-tx-lp-imag.csv};
+				\end{groupplot}
+			\end{tikzpicture}
+			\caption{Symbol-encoding steps in the time domain for random QPSK sequence with real (orange) and imaginary (green) part.}
 		\end{figure}
 	\end{frame}
 	
-	\begin{frame}{Pulse-shaping}
-		\begin{columns}[c, onlytextwidth]
-			\column{0.5\textwidth}
-			\begin{figure}
-				\begin{tikzpicture}
-					\begin{groupplot}[
-						group style={
-							group name=plot,
-							group size=1 by 4,
-							vertical sep=1mm,
-						},
-						ylabel style={align=center},
-						grid=major,
-						width=\linewidth,
-						height=27mm,
-						cycle list name=exotic,
-						axis line style={thick},
+	\begin{frame}{Symbol-encoding steps in the frequency domain}
+		\vspace{-6mm}
+		\begin{figure}
+			\begin{tikzpicture}
+				\begin{groupplot}[
+					group style={
+						group name=plot,
+						group size=2 by 3,
+						vertical sep=2mm,
+						horizontal sep=26mm,
+					},
+					grid=major,
+					width=0.44\linewidth,
+					height=30mm,
+					xmin=-4,
+					xmax=4,
+					xtick distance=1,
+					ymin=-60,
+					ymax=5,
+					ylabel style={align=center},
+					axis line style={thick},
+					cycle list name=exotic,
+				]
+					\nextgroupplot[
+						xticklabels={},
+						ylabel={PSD $\alpha[m]$\\(\si{\decibel})},
 					]
-						\nextgroupplot[
-							xmin=10,
-							xmax=20,
-							%xlabel={Symbol index $km$},
-							%xlabel near ticks,
-							%xticklabel pos=top,
-							ylabel={$\alpha[km]$},
-						]
-						\addplot+[
-							very thick,
-							ycomb,
-							mark=o,
-							restrict expr to domain={\thisrow{c1}}{10:20},
-						] plot table[col sep=comma] {./data/rand-time-tx-sym-real.csv};
-						\addplot+[
-							very thick,
-							ycomb,
-							mark=x,
-							restrict expr to domain={\thisrow{c1}}{10:20},
-						] plot table[col sep=comma] {./data/rand-time-tx-sym-imag.csv};
-						\nextgroupplot[
-							xmin=10,
-							xmax=20,
-							xlabel={},
-							xticklabels={},
-							ylabel={$\rho[m]$},
-						]
-						\addplot+[
-							very thick,
-							ycomb,
-							mark=o,
-							restrict expr to domain={\thisrow{c1}}{10:20},
-						] plot table[col sep=comma] {./data/rand-time-tx-up-real.csv};
-						\addplot+[
-							very thick,
-							ycomb,
-							mark=x,
-							restrict expr to domain={\thisrow{c1}}{10:20},
-						] plot table[col sep=comma] {./data/rand-time-tx-up-imag.csv};
-						\nextgroupplot[
-							xmin=10,
-							xmax=20,
-							xlabel={},
-							xticklabels={},
-							ylabel={$\gamma[m]$},
-						]
-						\addplot+[
-							very thick,
-							ycomb,
-							mark=o,
-							restrict expr to domain={\thisrow{c1}}{10:20},
-						] plot table[col sep=comma] {./data/rand-time-tx-rrc-real.csv};
-						\addplot+[
-							very thick,
-							ycomb,
-							mark=x,
-							restrict expr to domain={\thisrow{c1}}{10:20},
-						] plot table[col sep=comma] {./data/rand-time-tx-rrc-imag.csv};
-						\nextgroupplot[
-							xmin=10,
-							xmax=20,
-							xlabel={Signal time $t/T_s$},
-							ylabel={$\alpha(t)$},
-						]
-						\addplot+[
-							very thick,
-							no markers,
-							restrict expr to domain={\thisrow{c1}}{10:20},
-						] plot table[col sep=comma, y expr=\thisrow{c2}*4] {./data/rand-time-tx-lp-real.csv};
-						\addplot+[
-							very thick,
-							no markers,
-							restrict expr to domain={\thisrow{c1}}{10:20},
-						] plot table[col sep=comma] {./data/rand-time-tx-lp-imag.csv};
-					\end{groupplot}
-				\end{tikzpicture}
-			\end{figure}
+					\addplot+[
+						very thick,
+						no markers,
+					] plot table[col sep=comma] {./data/rand-freq-tx-sym.csv};
+					\addplot+[
+						very thick,
+						no markers,
+					] plot table[col sep=comma] {./data/unit-freq-tx-sym.csv};
+					
+					\nextgroupplot[
+						xticklabels={},
+						ylabel={PSD $\gamma(t)$\\(\si{\decibel})},
+					]
+					\addplot+[
+						very thick,
+						no markers,
+					] plot table[col sep=comma] {./data/rand-freq-tx-dac.csv};
+					\addplot+[
+						very thick,
+						no markers,
+					] plot table[col sep=comma] {./data/unit-freq-tx-dac.csv};
 
-			\column{0.5\textwidth}
-			\begin{figure}
-				\begin{tikzpicture}
-					\begin{groupplot}[
-						group style={
-							group name=plot,
-							group size=1 by 5,
-							xlabels at=edge bottom,
-							xticklabels at=edge bottom,
-							vertical sep=1mm,
-						},
-						grid=major,
-						width=\linewidth,
-						height=25mm,
-						xlabel={Frequency $f/f_s$},
-			%			yticklabels={},
-						%ylabel={Power spectral\\density (\si{\decibel})},
-						%ylabel style={align=center},
-						axis line style={thick},
-						cycle list name=exotic,
+					\nextgroupplot[
+						xticklabels={},
+						ylabel={PSD $\rho[m]$\\(\si{\decibel})},
 					]
-						\nextgroupplot[
-							%title={$\alpha[km],x[km]$ encoding symbols},
-							xmin=-4,
-							xmax=4,
-							xtick distance=0.5,
-							ymin=-60,
-							ymax=5,
-						]
-						\addplot+[
-							very thick,
-							no markers,
-						] plot table[col sep=comma] {./data/rand-freq-tx-sym.csv};
-						\nextgroupplot[
-							%title={$\rho[m],r[m]$ after upsampling $\alpha[km],x[km]$},
-							xmin=-4,
-							xmax=4,
-							xtick distance=0.5,
-							ymin=-60,
-							ymax=5,
-			%				ylabel={Upsampling\\$\rho[m],r[m]$},
-						]
-						\addplot+[
-							very thick,
-							no markers,
-						] plot table[col sep=comma] {./data/rand-freq-tx-up.csv};
-						\nextgroupplot[
-							%title={$\gamma[m],q[m]$ after pulse-shaping $\rho[m],r[m]$},
-							xmin=-4,
-							xmax=4,
-							xtick distance=0.5,
-							ymin=-60,
-							ymax=5,
-			%				ylabel={Pulse-shaping\\$\gamma[m],q[m]$},
-						]
-						\addplot+[
-							very thick,
-							no markers,
-						] plot table[col sep=comma] {./data/rand-freq-tx-rrc.csv};
-						\nextgroupplot[
-							%title={$\gamma(t),q(t)$ after analog converting $\gamma[m],q[m]$},
-							xmin=-4,
-							xmax=4,
-							xtick distance=0.5,
-							ymin=-60,
-							ymax=5,
-							%ylabel={Analog-conv.\\$\gamma(t),q(t)$},
-						]
-						\addplot+[
-							very thick,
-							no markers,
-						] plot table[col sep=comma] {./data/rand-freq-tx-dac.csv};
-						\nextgroupplot[
-							%title={$\alpha(t),x(t)$ after anti-aliasing $\gamma(t),q(t)$},
-							xmin=-4,
-							xmax=4,
-							xtick distance=0.5,
-							ymin=-60,
-							ymax=5,
-							%ylabel={Anti-aliasing\\$\alpha(t),x(t)$},
-						]
-						\addplot+[
-							very thick,
-							no markers,
-						] plot table[col sep=comma] {./data/rand-freq-tx-lp.csv};
-					\end{groupplot}
-				\end{tikzpicture}
-			\end{figure}
-		\end{columns}
+					\addplot+[
+						very thick,
+						no markers,
+					] plot table[col sep=comma] {./data/rand-freq-tx-up.csv};
+					\addplot+[
+						very thick,
+						no markers,
+					] plot table[col sep=comma] {./data/unit-freq-tx-up.csv};					
+					
+					\nextgroupplot[
+						xlabel={Frequency $f/f_s$},
+						ylabel={PSD $\alpha(t)$\\(\si{\decibel})},
+					]
+					\addplot+[
+						very thick,
+						no markers,
+					] plot table[col sep=comma] {./data/rand-freq-tx-lp.csv};
+					\addplot+[
+						very thick,
+						no markers,
+					] plot table[col sep=comma] {./data/unit-freq-tx-lp.csv};
+					
+					\nextgroupplot[
+						xlabel={Frequency $f/f_s$},
+						ylabel={PSD $\gamma[m]$\\(\si{\decibel})},
+					]
+					\addplot+[
+						very thick,
+						no markers,
+					] plot table[col sep=comma] {./data/rand-freq-tx-rrc.csv};
+					\addplot+[
+						very thick,
+						no markers,
+					] plot table[col sep=comma] {./data/unit-freq-tx-rrc.csv};
+				\end{groupplot}
+			\end{tikzpicture}
+			\caption{Symbol-encoding steps in the frequency domain for random symbols (green) and single symbol (orange).}
+		\end{figure}
 	\end{frame}
 		
 	\begin{frame}{Upconversion}
@@ -550,6 +498,28 @@
 	\end{frame}
 	
 	\section{Coherent state receiver}
+	
+	\begin{frame}{Software-defined receiver architecture}
+		\begin{figure}
+			\begin{tikzpicture}[
+				node distance=15mm,
+				arrow/.style={very thick, -Latex},
+				block/.style={draw, very thick, minimum width=20mm, minimum height=15mm},
+			]
+				\coordinate (in) at (0,0);
+				\node (dsp) [block, right=of in] {DEMOD};
+				\node (dac) [block, right=of dsp] {ADC};
+				\node (mod) [block, right=of dac] {DSP};
+				\coordinate[right=of mod] (out);
+				
+				\draw[arrow] (in) -- (dsp) node[midway, above] {$\ket{\beta(t)}$};
+				\draw[arrow] (dsp.east) -- (dac.west) node[midway, above] {$u(t)$};
+				\draw[arrow] (dac.east) -- (mod.west) node[midway, above]{$u[m]$};
+				\draw[arrow] (mod) -- (out) node[midway, above] {$\left\{\beta_n\right\}_{n\in I}$};
+			\end{tikzpicture}
+			\caption{Block diagram of software-defined transmitter architecture including symbol encoding in the digital domain, digital-to-analog conversion and electro-optical modulation.}
+		\end{figure}
+	\end{frame}
 	
 	\begin{frame}{Downconversion}
 		
