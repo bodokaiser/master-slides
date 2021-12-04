@@ -12,7 +12,6 @@
 \usepackage{siunitx}
 \usepackage{pgfplots}
 \usepackage{circuitikz}
-\usepackage{appendixnumberbeamer}
 
 \usetheme{metropolis}
 
@@ -25,6 +24,8 @@
 \usetikzlibrary{arrows.meta}
 \usetikzlibrary{fit}
 \usetikzlibrary{positioning}
+\usetikzlibrary{shapes.geometric}
+\usetikzlibrary{shapes.misc}
 \usepgfplotslibrary{groupplots}
 
 \definecolor{exotic orange}{RGB}{255,128,0}
@@ -488,39 +489,138 @@
 			\caption{Symbol-encoding steps in the frequency domain for random symbols (green) and single symbol (orange).}
 		\end{figure}
 	\end{frame}
-		
-	\begin{frame}{Upconversion}
-		
+
+	\section{Coherent state transmitter}
+
+	\begin{frame}{Dual-quadrature upconversion in time domain}
+		\begin{figure}
+			\begin{tikzpicture}[
+					line width=0.2mm,
+					node distance=5mm,
+				]
+					\node (div) [twoportsplitshape, circuitikz/t1={\SI{0}{\degree}}, circuitikz/t2={\SI{90}{\degree}}] {};
+					\node (osc) [right=of div] {$\sqrt{2}\cos(\omega_ct+\vartheta)$};
+					\node (add) [adder, right=of osc] {};
+					\node (mixx) [mixer, above=of div] {};
+					\node (mixp) [mixer, below=of div] {};
+					\node (bndx) [bandpassshape, right=of mixx] {};
+					\node (bndp) [bandpassshape, right=of mixp] {};
+					
+					\node (inx) [left=of mixx] {$x(t)$};
+					\node (inp) [left=of mixp] {$p(t)$};
+					\node (out) [right=of add] {$s(t)$};
+					
+					\draw[-Latex] (inx) -- (mixx.west);
+					\draw[-Latex] (inp) -- (mixp.west);
+					\draw[-Latex] (osc.west) -- (div.east);
+					\draw[-Latex] (div.north) -- (mixx.south);
+					\draw[-Latex] (div.south) -- (mixp.north);
+					\draw[-Latex] (mixx.east) -- (bndx.west);
+					\draw[-Latex] (mixp.east) -- (bndp.west);
+					\draw[-Latex] (bndx.east) -- (bndx.east-|add.north) -- (add.north);
+					\draw[-Latex] (bndp.east) -- (bndp.east-|add.south) -- (add.south);
+					\draw[-Latex] (add) -- (out);
+				\end{tikzpicture}
+			\caption{Power spectrum illustrating single-quadrature upconversion.}
+		\end{figure}
+		\begin{equation}
+			s(t)
+			=
+			x(t)
+			\cos(\omega_0t+\vartheta)
+			-
+			p(t)
+			\sin(\omega_0t+\vartheta)
+			=
+			\Re\left[
+				\alpha(t)
+				e^{i(\omega t+\vartheta)}				
+			\right]
+		\end{equation}
+	\end{frame}
+	
+	\begin{frame}{Dual-quadrature upconversion in frequency domain}
+		\begin{figure}
+			\begin{tikzpicture}
+				\draw[very thick, -Latex] (0,0) -- ++(0,2.5) node[above] {$\abs{\alpha(\omega)}^2$};
+				\draw[very thick, {-Bar[slant=.5]}] (-5,0) -- (-1.55,0);
+				\draw[very thick, {Bar[slant=.5]-Bar[slant=.5]}] (-1.45,0) -- (1.45,0);
+				\draw[very thick, {Bar[slant=.5]-Latex}] (1.55,0) -- (5,0) node[right] {$\omega$};
+				\draw[very thick] (0,0) -- ++(0,-0.15) node[below] {$0$};
+				
+				\draw[very thick] (-0.5,0) -- ++(0,0.5) -- ++(0.5,0) -- ++(0.5,0.25) -- ++(0,-0.75);
+				\draw[very thick] (3,1) -- ++(0,-1.15) node[below] {$+\omega_0$};
+				\draw[very thick] (-3,1) -- ++(0,-1.15) node[below] {$-\omega_0$};
+				\draw[very thick, dashed] (-3.5,0) -- ++(0,0.5) -- ++(0.5,0) -- ++(0.5,0.25) -- ++(0,-0.75);
+				\draw[very thick, dashed] (2.5,0) -- ++(0,0.5) -- ++(0.5,0) -- ++(0.5,0.25) -- ++(0,-0.75);
+				
+				\draw[Bar-Bar, very thick] (-3.5,1.5) -- ++(1,0) node[midway, above] {$B_s$};
+			\end{tikzpicture}
+			\caption{Power spectrum illustrating dual-quadrature upconversion.}
+		\end{figure}
+		\begin{equation}
+			s(t)
+			=
+			\Re
+			\int_{\omega_0-B_s/2}^{\omega_0+B_s/2}
+			\frac{\dd{\omega}}{2\pi}
+			\alpha(\omega-\omega_0)
+			e^{i(\omega t+\vartheta)}
+		\end{equation}
 	\end{frame}
 	
 	\begin{frame}{In-phase and quadrature modulator}
+		\begin{figure}
+			\begin{tikzpicture}[
+				electrode/.style={very thick},
+				waveguide/.style={line width=1.2mm, rounded corners=1mm},
+			]
+				\draw[electrode] (0,2.8) rectangle ++(2,0.2);
+				\draw[electrode] (0,1.9) rectangle ++(2,0.6) node[pos=0.5] {$I(t)$};
+				\draw[electrode] (0,1.4) rectangle ++(2,0.2);
+				\draw[electrode] (0,0.5) rectangle ++(2,0.6) node[pos=0.5] {$Q(t)$};
+				\draw[electrode] (0,0) rectangle ++(2,0.2);
 		
+				\draw[waveguide] (1,0.8) node[draw, regular polygon, regular polygon sides=6, minimum width=1.05cm, xscale=4] (mzm1) {};
+				\draw[waveguide] (1,2.2) node[draw, regular polygon, regular polygon sides=6, minimum width=1.05cm, xscale=4] (mzm2) {};
+				
+				\draw[electrode] (3.8,1.2) rectangle ++(2,0.6) node[pos=0.5] {$\Lambda$};
+				\draw[electrode] (3.8,0.7) rectangle ++(2,0.2);
+				\draw[electrode] (3.8,2.1) rectangle ++(2,0.2);
+		
+				\path (6.9,1.5) coordinate (out);
+				\path (mzm1.east)
+					++(-0.3,0) coordinate (a1) 
+					++(0.2,0) coordinate (b1)
+					(3.7,1.05) coordinate (c1) 
+					++(2.25,0) coordinate (d1);
+				\path (mzm2.east-|a1) coordinate (a2)
+						(a2-|b1) coordinate (b2)
+						(3.7,1.95) coordinate (c2)
+						(c2-|d1) coordinate (d2);
+		
+				\draw[waveguide] (a1) -- (b1) -- (c1) -- (d1) -- (out) -- (d2) -- (c2) -- (b2) -- (a2);
+		
+				\draw[waveguide] (mzm1.west) ++(0.3,0) -- ++(-0.2,0) -- ++(-1.2,0.7) coordinate (in) -- ++(1.2,0.7) -- ++(0.2,0) -- ++(0.2,0) (mzm2.west);
+				
+				\draw[waveguide] (in) -- ++(-1.5,0) node[midway, above] {$\alpha(t)$};
+				\draw[waveguide] (out) -- ++(1.5,0) node[midway, above] {$\alpha^\prime(t)$};
+			\end{tikzpicture}
+			\caption{Drawing of an integrated in-phase and quadrature modulator.}
+		\end{figure}
+		\begin{equation}
+			\ket{\beta(t)}
+			\to
+			\ket{\alpha(t)\beta(t)}
+			\qquad
+			\alpha(t)
+			=
+			I(t)+iQ(t)
+		\end{equation}
 	\end{frame}
 	
 	\section{Coherent state receiver}
-	
-	\begin{frame}{Software-defined receiver architecture}
-		\begin{figure}
-			\begin{tikzpicture}[
-				node distance=15mm,
-				arrow/.style={very thick, -Latex},
-				block/.style={draw, very thick, minimum width=20mm, minimum height=15mm},
-			]
-				\coordinate (in) at (0,0);
-				\node (dsp) [block, right=of in] {DEMOD};
-				\node (dac) [block, right=of dsp] {ADC};
-				\node (mod) [block, right=of dac] {DSP};
-				\coordinate[right=of mod] (out);
-				
-				\draw[arrow] (in) -- (dsp) node[midway, above] {$\ket{\beta(t)}$};
-				\draw[arrow] (dsp.east) -- (dac.west) node[midway, above] {$u(t)$};
-				\draw[arrow] (dac.east) -- (mod.west) node[midway, above]{$u[m]$};
-				\draw[arrow] (mod) -- (out) node[midway, above] {$\left\{\beta_n\right\}_{n\in I}$};
-			\end{tikzpicture}
-			\caption{Block diagram of software-defined transmitter architecture including symbol encoding in the digital domain, digital-to-analog conversion and electro-optical modulation.}
-		\end{figure}
-	\end{frame}
-	
+
 	\begin{frame}{Downconversion}
 		
 	\end{frame}
@@ -532,44 +632,6 @@
 	\section{Conclusion and outlook}
 	
 	\begin{frame}{Conclusion and outlook}
-	\end{frame}
-	
-	\appendix
-	
-	\begin{frame}{Classical post-processing pipeline}
-		\begin{figure}
-	\begin{tikzpicture}[
-		block/.style={draw, very thick, minimum height=8mm},
-	]
-		\node[block, minimum width=8cm] (qt) at (0,0) {Quantum transmission};
-		\node[block, minimum width=8cm] (pt) at (0,-1.2) {Partitioning};
-		
-		\node[block, minimum width=3.5cm] (sm) at (-2.25,-2.4) {Symbol mapping};
-		\node[block, minimum width=4cm] (pe) at (2,-2.4) {Parameter estimation};
-		\node[block, minimum width=6cm] (ir) at (-1,-3.6) {Information reconciliation};
-		\node[block, minimum width=8cm] (pa) at (0,-4.8) {Privacy amplification};
-
-		\draw[-Latex] (qt) -- (pt);
-		\draw[Latex-] (sm.north) -- (sm.north|-pt.south);
-		\draw[Latex-] (pe.north) -- (pe.north|-pt.south);
-		\draw[-Latex] (sm.south) -- (sm.south|-ir.north);
-		\draw[-Latex] (ir.south) -- (ir.south|-pa.north);
-
-		\begin{scope}[transform canvas={xshift=-1cm}]
-			\draw[-Latex] (pe.south) -- (pe.south|-ir.north);
-		\end{scope}
-		\begin{scope}[transform canvas={xshift=1cm}]
-			\draw[-Latex] (pe.south) -- (pe.south|-pa.north);
-		\end{scope}
-		
-		\node[block, rotate=90, minimum width=2.4cm] (ver) at (5,-4) {Verification};
-		\node[block, rotate=90, minimum width=5.6cm] (abort) at (6.4,-2.4) {Abort protocol or discard block};
-		\draw[-Latex] (pe.east) -- (pe.east-|abort.north);
-		\draw[-Latex] (pa.east) -- (pa.east-|ver.north);
-		\draw[-Latex] (ver.south) -- (ver.south-|abort.north);
-	\end{tikzpicture}
-		\caption{Block diagram of classical post-processing pipeline.}
-		\end{figure}
 	\end{frame}
 
 \end{document}
