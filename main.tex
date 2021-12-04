@@ -620,13 +620,213 @@
 	\end{frame}
 	
 	\section{Coherent state receiver}
+	
+	\begin{frame}{Software-defined receiver architecture}
+		\begin{figure}
+			\begin{tikzpicture}[
+				node distance=15mm,
+				arrow/.style={very thick, -Latex},
+				block/.style={draw, very thick, minimum width=18mm, minimum height=12mm},
+			]
+				\coordinate (in) at (0,0);
+				\node (dsp) [block, right=of in] {DEMOD};
+				\node (dac) [block, right=of dsp] {ADC};
+				\node (mod) [block, right=of dac] {DSP};
+				\coordinate[right=of mod] (out);
+				
+				\draw[arrow] (in) -- (dsp) node[midway, above] {$\ket{\beta(t)}$};
+				\draw[arrow] (dsp.east) -- (dac.west) node[midway, above] {$u(t)$};
+				\draw[arrow] (dac.east) -- (mod.west) node[midway, above]{$u[m]$};
+				\draw[arrow] (mod) -- (out) node[midway, above] {$\left\{\beta_n\right\}_{n\in I}$};
+			\end{tikzpicture}
+			\caption{Block diagram of software-defined receiver architecture including electro-optical demodulation, analog-to-digital converter, and digital signal processing for symbol decoding.}
+		\end{figure}
+		\begin{figure}
+			\begin{tikzpicture}[
+				node distance=4mm,
+				line width=0.2mm,
+			]
+				\node (in) {$\Re\left[\beta(t)e^{+i\omega_ct}\right]$};
+				\node (mixa) [mixer, right=of in] {};
+				\node (low) [lowpassshape, right=of mixa] {};
+				\node (osca) [below=of mixa] {$\cos(\omega_ct+\vartheta)$};
+				\node (adc) [adcshape, right=of low] {};
+				\node (mixd) [mixer, right=of adc] {};
+				\node (oscd) [below=of mixd] {$\exp(i\omega_it)$};
+				\node (down1) [twoportshape, t={$\downarrow l$}, right=of mixd] {};
+				\node (rrc) [twoportshape, t={RRC}, right=of down1] {};
+				\node (down2) [twoportshape, t={$\downarrow k$}, right=of rrc] {};
+				\node (out) [right=of down2] {$\beta[n]$};
+				
+				\draw[-Latex] (in) -- (mixa.west);
+				\draw[-Latex] (mixa.east) -- (low.west);
+				\draw[-Latex] (low.east) -- (adc.west);
+				\draw[-Latex] (adc.east) -- (mixd.west);
+				\draw[-Latex] (mixd.east) -- (down1.west);
+				\draw[-Latex] (down1.east) -- (rrc.west);
+				\draw[-Latex] (rrc.east) -- (down2.west);
+				\draw[-Latex] (down2.east) -- (out.west);
+				
+				\draw[-Latex] (osca.north) -- (mixa.south);
+				\draw[-Latex] (oscd.north) -- (mixd.south);
+			\end{tikzpicture}
+			\caption{Block diagram of the single-quadrature downconversion.}
+		\end{figure}
+	\end{frame}
 
-	\begin{frame}{Downconversion}
+	\begin{frame}{Single-quadrature downconversion in the frequency domain}
+		\begin{figure}
+			\begin{tikzpicture}
+				\draw[very thick, -Latex] (0,0) -- ++(0,2.5) node[above] {$\abs{x(\omega)}^2$};
+				\draw[very thick, {-Bar[slant=.5]}] (-1,0) -- (3.7,0);
+				\draw[very thick, {Bar[slant=.5]-Latex}] (3.8,0) -- (9,0) node[right] {$\omega$};
 		
+				\draw[very thick] (0,0) -- ++(0,-0.15) node[below] {$0$};
+				\draw[very thick] (1.25,0) -- ++(0,-0.15) node[below] {$\omega_i$};
+				\draw[very thick] (6.5,0) -- ++(0,-0.15) node[below] {$\omega_l+\omega_i$};
+				\draw[very thick] (6.5,0) -- ++(0,1);
+		
+				\draw[very thick, dashed] (5,0) -- ++(0,0.25) -- ++(3,0.75) -- ++(0,-1);
+				\draw[very thick, dotted] (-0.5,0) -- ++(0,0.25) -- ++(3,0.75) -- ++(0,-1);
+				\draw[very thick] (0,0.75) -- ++(0.5,0) -- ++(0,-0.25) -- ++(1.5,0.375) -- ++(0,-0.89);;
+				
+				\draw[-Bar, very thick] (0,1.5) -- ++(2.05,0) node[midway, above] {$B_d$};
+			\end{tikzpicture}
+			\caption{Power spectrum illustrating single-quadrature downconversion.}
+		\end{figure}
+		\begin{equation}
+			u(t)
+			=
+			\Re
+			\int_{0}^{+B_d/2}
+			\frac{\dd{\omega}}{2\pi}
+			\left[
+				\beta(\omega+\omega_l)
+				e^{+i\omega t}
+				+
+				z(\omega-\omega_l)^*
+				e^{-i\omega t}
+			\right]
+			e^{-i\vartheta}
+		\end{equation}
 	\end{frame}
 	
-	\begin{frame}{Balanced detector}
+	\begin{frame}{Single-quadrature heterodyning}
+		\begin{figure}
+			\begin{tikzpicture}
+				\draw[very thick, -Latex] (0,0) -- ++(0,2.5) node[above] {$\abs{x(\omega)}^2$};
+				\draw[very thick, {-Bar[slant=.5]}] (0,0) -- (3.45,0);
+				\draw[very thick, {Bar[slant=.5]-Latex}] (3.55,0) -- (10,0) node[right] {$\omega$};
 		
+				\draw[very thick] (0,0) -- ++(0,-0.15) node[below] {$0$};
+				\draw[very thick] (2,0) -- ++(0,-0.15) node[below] {$\omega_i$};
+				\draw[very thick] (6,0) -- ++(0,-0.15) node[below] {$\omega_c$};
+		
+				\draw[very thick] (7,0) -- ++(0,-0.15) node[below] {$\omega_l$};
+		
+				\draw[very thick, dashed] (5,0) -- ++(0,0.25) -- ++(0.5,0) -- ++(0,0.75) -- ++(1,-0.75) -- ++(2.5,0) -- ++(0,-0.25);
+				\draw[very thick] (7,0) -- ++(0,1);
+				\draw[very thick] (0,0.5) -- ++(0.5,0) -- ++(1,0.75) -- ++(0,-0.75) -- ++(0.5,0) -- ++(0,-0.5);
+				\draw[very thick, dotted] (0,0.25) -- ++(2,0) -- ++(0,-0.25);
+				
+				\draw[Bar-Bar, very thick] (5.5,1.5) -- ++(1,0) node[midway, above] {$B_s$};
+				\draw[-Bar, very thick] (0,1.5) -- ++(3,0) node[midway, above] {$B_d$};
+			\end{tikzpicture}
+			\caption{Foobar}
+		\end{figure}
+		\begin{equation}
+			u(t)
+			=
+			\Re
+			\int_{0}^{+B_d/2}
+			\frac{\dd{\omega}}{2\pi}
+			\left[
+				\beta(\omega+\omega_l)
+				e^{+i\omega t}
+				+
+				z(\omega-\omega_l)^*
+				e^{-i\omega t}
+			\right]
+			e^{-i\vartheta}
+		\end{equation}
+	\end{frame}
+	
+	\begin{frame}{Single-quadrature homodyning}
+		\begin{figure}
+			\begin{tikzpicture}
+				\draw[very thick, -Latex] (0,0) -- ++(0,2.5) node[above] {$\abs{x(\omega)}^2$};
+				\draw[very thick, {-Bar[slant=.5]}] (0,0) -- (3.45,0);
+				\draw[very thick, {Bar[slant=.5]-Latex}] (3.55,0) -- (10,0) node[right] {$\omega$};
+		
+				\draw[very thick] (0,0) -- ++(0,-0.15) node[below] {$0$};
+				\draw[very thick] (6,0) -- ++(0,-0.15) node[below] {$\omega_c=\omega_l$};
+		
+				\draw[very thick, dashed] (5,0) -- ++(0,0.25) -- ++(0.5,0) -- ++(0,0.75) -- ++(1,-0.75) -- ++(2.5,0) -- ++(0,-0.25);
+				\draw[very thick] (6,0) -- ++(0,1);
+		
+				\draw[very thick] (0,1.25) -- ++(0.5,0) -- (0.5,0.5) -- ++(0.5,0) -- ++(0,-0.25) -- ++(2,0) -- ++(0,-0.25);
+				\draw[very thick, dotted] (0,0.625) -- ++(0.5,0.375) -- (0.5,0.25) -- ++(0.5,0) -- ++(0,-0.25);
+				
+				\draw[Bar-Bar, very thick] (5.5,1.5) -- ++(1,0) node[midway, above] {$B_s$};
+				\draw[-Bar, very thick] (0,1.5) -- ++(3,0) node[midway, above] {$B_d$};
+			\end{tikzpicture}
+			\caption{Foobar}
+		\end{figure}
+	\end{frame}
+	
+	\begin{frame}{Balanced detector as single-quadrature downconverter}
+		\begin{columns}[c, onlytextwidth]
+			\column{0.45\textwidth}
+			\begin{figure}
+				\begin{tikzpicture}[
+					arrow/.style={very thick, -Latex},
+				]
+			        \draw[very thick, rounded corners=2pt] (0, 0) -- ++(1.5, 0) -- ++(0, -1.5) -- (0, 0) -- ++(0, -1.5) -- ++(1.5, 0);
+			        
+			        \draw[fill, rotate=-90, yshift=17mm, xshift=0.5mm] (1.5, 1.5) -- (1.5, 1.5) arc(0:180:0.8) --cycle;
+			        \draw[fill=black, rotate=-180, yshift=17mm, xshift=-14.5mm] (1.5, 1.5) -- (1.5, 1.5) arc(0:180:0.8) --cycle;
+
+			        \draw[arrow] (-1.5, -0.75) -- ++(1.4, 0) node[midway, above] {$\alpha_s(t)$};
+			        \draw[arrow] (0.75, 1.5) -- ++(0, -1.4) node[midway, right] {$\alpha_l(t)$};
+			        \draw[arrow] (0.75, -1.6) -- ++(0,-1.5) node[midway, left] {$\alpha_-(t)$};
+			        \draw[arrow] (1.65, -0.75) -- ++(1.5, 0) node[midway, above] {$\alpha_+(t)$};
+			    \end{tikzpicture}
+			    \caption{Electro-optical setup for balanced detection.}
+			\end{figure}
+
+			\column{0.55\textwidth}
+			\begin{equation}
+				i(t)
+				\propto
+				\Re
+				\int_{-B_d/2}^{+B_d/2}
+				\frac{\dd{\omega}}{2\pi}
+				\beta(\omega+\omega_l)
+				e^{+i(\omega t+\vartheta)}
+			\end{equation}
+			\begin{equation}
+				\hat{X}(t)
+				=
+				\int_{-\infty}^{+\infty}
+				\frac{\dd{\omega}}{2\pi}
+				\left[
+					\hat{a}(\omega)
+					e^{-i\omega t}
+					+
+					\text{H.c.}
+				\right]
+			\end{equation}
+			\begin{equation}
+				\hat{U}^\dagger
+				\hat{a}(\omega)
+				\hat{U}
+				=
+				\sum_{m\in\mathbb{Z}}
+				J_m(\theta)
+				\hat{a}(\omega+m\omega_l)
+				e^{-im\vartheta}
+			\end{equation}
+		\end{columns}
 	\end{frame}
 	
 	\section{Conclusion and outlook}
