@@ -58,7 +58,7 @@
 						\node[venn circle, fill=exotic orange] (qp) at (330:1.4) {};
 					\end{scope}
 					
-					\node[venn label] {QKD};
+					\node[venn label] {CV-QKD};
 					\node[venn label] at (90:2.5) {Communication\\engineering};
 					\node[venn label] at (210:2.5) {Quantum\\physics};
 					\node[venn label] at (330:2.5) {Information\\theory};
@@ -274,7 +274,9 @@
 			\end{tikzpicture}
 			\caption{Block diagram of the software-defined transmitter architecture.}
 		\end{figure}
-		
+	\end{frame}
+	
+	\begin{frame}{Digital signal processing pipeline for symbol encoding}
 		\begin{figure}
 			\begin{tikzpicture}[
 				line width=0.2mm,
@@ -490,16 +492,15 @@
 		\end{figure}
 	\end{frame}
 
-	\section{Coherent state transmitter}
-
 	\begin{frame}{Dual-quadrature upconversion in time domain}
 		\begin{figure}
 			\begin{tikzpicture}[
 					line width=0.2mm,
-					node distance=5mm,
+					node distance=8mm,
+					arrow/.style={very thick, -Latex},
 				]
 					\node (div) [twoportsplitshape, circuitikz/t1={\SI{0}{\degree}}, circuitikz/t2={\SI{90}{\degree}}] {};
-					\node (osc) [right=of div] {$\sqrt{2}\cos(\omega_ct+\vartheta)$};
+					\node (osc) [right=of div] {$\sqrt{2}\cos(\omega_ct)$};
 					\node (add) [adder, right=of osc] {};
 					\node (mixx) [mixer, above=of div] {};
 					\node (mixp) [mixer, below=of div] {};
@@ -510,16 +511,16 @@
 					\node (inp) [left=of mixp] {$p(t)$};
 					\node (out) [right=of add] {$s(t)$};
 					
-					\draw[-Latex] (inx) -- (mixx.west);
-					\draw[-Latex] (inp) -- (mixp.west);
-					\draw[-Latex] (osc.west) -- (div.east);
-					\draw[-Latex] (div.north) -- (mixx.south);
-					\draw[-Latex] (div.south) -- (mixp.north);
-					\draw[-Latex] (mixx.east) -- (bndx.west);
-					\draw[-Latex] (mixp.east) -- (bndp.west);
-					\draw[-Latex] (bndx.east) -- (bndx.east-|add.north) -- (add.north);
-					\draw[-Latex] (bndp.east) -- (bndp.east-|add.south) -- (add.south);
-					\draw[-Latex] (add) -- (out);
+					\draw[arrow] (inx) -- (mixx.west);
+					\draw[arrow] (inp) -- (mixp.west);
+					\draw[arrow] (osc.west) -- (div.east);
+					\draw[arrow] (div.north) -- (mixx.south);
+					\draw[arrow] (div.south) -- (mixp.north);
+					\draw[arrow] (mixx.east) -- (bndx.west);
+					\draw[arrow] (mixp.east) -- (bndp.west);
+					\draw[arrow] (bndx.east) -- (bndx.east-|add.north) -- (add.north);
+					\draw[arrow] (bndp.east) -- (bndp.east-|add.south) -- (add.south);
+					\draw[arrow] (add) -- (out);
 				\end{tikzpicture}
 			\caption{Power spectrum illustrating single-quadrature upconversion.}
 		\end{figure}
@@ -527,14 +528,14 @@
 			s(t)
 			=
 			x(t)
-			\cos(\omega_0t+\vartheta)
+			\cos(\omega_ct)
 			-
 			p(t)
-			\sin(\omega_0t+\vartheta)
+			\sin(\omega_ct)
 			=
 			\Re\left[
 				\alpha(t)
-				e^{i(\omega t+\vartheta)}				
+				e^{+i\omega_c t}
 			\right]
 		\end{equation}
 	\end{frame}
@@ -549,8 +550,8 @@
 				\draw[very thick] (0,0) -- ++(0,-0.15) node[below] {$0$};
 				
 				\draw[very thick] (-0.5,0) -- ++(0,0.5) -- ++(0.5,0) -- ++(0.5,0.25) -- ++(0,-0.75);
-				\draw[very thick] (3,1) -- ++(0,-1.15) node[below] {$+\omega_0$};
-				\draw[very thick] (-3,1) -- ++(0,-1.15) node[below] {$-\omega_0$};
+				\draw[very thick] (3,1) -- ++(0,-1.15) node[below] {$+\omega_c$};
+				\draw[very thick] (-3,1) -- ++(0,-1.15) node[below] {$-\omega_c$};
 				\draw[very thick, dashed] (-3.5,0) -- ++(0,0.5) -- ++(0.5,0) -- ++(0.5,0.25) -- ++(0,-0.75);
 				\draw[very thick, dashed] (2.5,0) -- ++(0,0.5) -- ++(0.5,0) -- ++(0.5,0.25) -- ++(0,-0.75);
 				
@@ -564,8 +565,8 @@
 			\Re
 			\int_{\omega_0-B_s/2}^{\omega_0+B_s/2}
 			\frac{\dd{\omega}}{2\pi}
-			\alpha(\omega-\omega_0)
-			e^{i(\omega t+\vartheta)}
+			\alpha(\omega-\omega_c)
+			e^{+i\omega t}
 		\end{equation}
 	\end{frame}
 	
@@ -641,36 +642,52 @@
 			\end{tikzpicture}
 			\caption{Block diagram of software-defined receiver architecture including electro-optical demodulation, analog-to-digital converter, and digital signal processing for symbol decoding.}
 		\end{figure}
+	\end{frame}
+	
+	\begin{frame}{Signal processing pipeline for symbol decoding}
 		\begin{figure}
 			\begin{tikzpicture}[
-				node distance=4mm,
+				node distance=8mm,
 				line width=0.2mm,
+				arrow/.style={very thick, -Latex},
 			]
 				\node (in) {$\Re\left[\beta(t)e^{+i\omega_ct}\right]$};
-				\node (mixa) [mixer, right=of in] {};
-				\node (low) [lowpassshape, right=of mixa] {};
-				\node (osca) [below=of mixa] {$\cos(\omega_ct+\vartheta)$};
-				\node (adc) [adcshape, right=of low] {};
-				\node (mixd) [mixer, right=of adc] {};
-				\node (oscd) [below=of mixd] {$\exp(i\omega_it)$};
-				\node (down1) [twoportshape, t={$\downarrow l$}, right=of mixd] {};
+				\node (mix) [mixer, right=of in] {};
+				\node (low) [lowpassshape, right=of mix] {};
+				\node (osc) [below=of mix] {$\cos(\omega_ct+\vartheta)$};
+				\node (out) [right=of low] {$u(t)$};
+				
+				\draw[arrow] (in) -- (mix.west);
+				\draw[arrow] (mix.east) -- (low.west);
+				\draw[arrow] (osc) -- (mix.south);
+				\draw[arrow] (low.east) -- (out);
+			\end{tikzpicture}
+			\caption{Block diagram of single-quadrature downconversion.}
+		\end{figure}
+		\begin{figure}
+			\begin{tikzpicture}[
+				node distance=8mm,
+				line width=0.2mm,
+				arrow/.style={very thick, -Latex},
+			]
+				\node (in) {$u(t)$};
+				\node (adc) [adcshape, right=of in] {};
+				\node (mix) [mixer, right=of adc] {};
+				\node (osc) [below=of mix] {$\exp(i\omega_it)$};
+				\node (down1) [twoportshape, t={$\downarrow l$}, right=of mix] {};
 				\node (rrc) [twoportshape, t={RRC}, right=of down1] {};
 				\node (down2) [twoportshape, t={$\downarrow k$}, right=of rrc] {};
 				\node (out) [right=of down2] {$\beta[n]$};
 				
-				\draw[-Latex] (in) -- (mixa.west);
-				\draw[-Latex] (mixa.east) -- (low.west);
-				\draw[-Latex] (low.east) -- (adc.west);
-				\draw[-Latex] (adc.east) -- (mixd.west);
-				\draw[-Latex] (mixd.east) -- (down1.west);
-				\draw[-Latex] (down1.east) -- (rrc.west);
-				\draw[-Latex] (rrc.east) -- (down2.west);
-				\draw[-Latex] (down2.east) -- (out.west);
-				
-				\draw[-Latex] (osca.north) -- (mixa.south);
-				\draw[-Latex] (oscd.north) -- (mixd.south);
+				\draw[arrow] (in) -- (adc.west);
+				\draw[arrow] (adc.east) -- (mix.west);
+				\draw[arrow] (mix.east) -- (down1.west);
+				\draw[arrow] (down1.east) -- (rrc.west);
+				\draw[arrow] (rrc.east) -- (down2.west);
+				\draw[arrow] (down2.east) -- (out.west);
+				\draw[arrow] (osc.north) -- (mix.south);
 			\end{tikzpicture}
-			\caption{Block diagram of the single-quadrature downconversion.}
+			\caption{Block diagram of the symbol-decoding including analog-to-digital conversion and pulse-shaping.}
 		\end{figure}
 	\end{frame}
 
@@ -704,14 +721,14 @@
 				\beta(\omega+\omega_l)
 				e^{+i\omega t}
 				+
-				z(\omega-\omega_l)^*
+				\beta(\omega-\omega_l)^*
 				e^{-i\omega t}
 			\right]
 			e^{-i\vartheta}
 		\end{equation}
 	\end{frame}
 	
-	\begin{frame}{Single-quadrature heterodyning}
+	\begin{frame}{Single-quadrature heterodyne detection}
 		\begin{figure}
 			\begin{tikzpicture}
 				\draw[very thick, -Latex] (0,0) -- ++(0,2.5) node[above] {$\abs{x(\omega)}^2$};
@@ -732,7 +749,7 @@
 				\draw[Bar-Bar, very thick] (5.5,1.5) -- ++(1,0) node[midway, above] {$B_s$};
 				\draw[-Bar, very thick] (0,1.5) -- ++(3,0) node[midway, above] {$B_d$};
 			\end{tikzpicture}
-			\caption{Foobar}
+			\caption{Power spectrum illustrating heterodyne detection.}
 		\end{figure}
 		\begin{equation}
 			u(t)
@@ -741,17 +758,17 @@
 			\int_{0}^{+B_d/2}
 			\frac{\dd{\omega}}{2\pi}
 			\left[
-				\beta(\omega+\omega_l)
+				\beta(\omega+\omega_i)
 				e^{+i\omega t}
 				+
-				z(\omega-\omega_l)^*
+				z(\omega-\omega_i)^*
 				e^{-i\omega t}
 			\right]
 			e^{-i\vartheta}
 		\end{equation}
 	\end{frame}
 	
-	\begin{frame}{Single-quadrature homodyning}
+	\begin{frame}{Single-quadrature homodyne detection}
 		\begin{figure}
 			\begin{tikzpicture}
 				\draw[very thick, -Latex] (0,0) -- ++(0,2.5) node[above] {$\abs{x(\omega)}^2$};
@@ -770,13 +787,29 @@
 				\draw[Bar-Bar, very thick] (5.5,1.5) -- ++(1,0) node[midway, above] {$B_s$};
 				\draw[-Bar, very thick] (0,1.5) -- ++(3,0) node[midway, above] {$B_d$};
 			\end{tikzpicture}
-			\caption{Foobar}
+			\caption{Power spectrum illustrating homodyne detection.}
 		\end{figure}
+		\begin{equation}
+			u(t)
+			=
+			\Re
+			\int_{0}^{+B_d/2}
+			\frac{\dd{\omega}}{2\pi}
+			\left[
+				\beta(\omega)
+				e^{+i\omega t}
+				+
+				\beta(\omega)^*
+				e^{-i\omega t}
+			\right]
+			e^{-i\vartheta}
+		\end{equation}
 	\end{frame}
 	
 	\begin{frame}{Balanced detector as single-quadrature downconverter}
 		\begin{columns}[c, onlytextwidth]
 			\column{0.45\textwidth}
+			\vspace{-8mm}
 			\begin{figure}
 				\begin{tikzpicture}[
 					arrow/.style={very thick, -Latex},
@@ -795,43 +828,76 @@
 			\end{figure}
 
 			\column{0.55\textwidth}
-			\begin{equation}
-				i(t)
-				\propto
-				\Re
-				\int_{-B_d/2}^{+B_d/2}
-				\frac{\dd{\omega}}{2\pi}
-				\beta(\omega+\omega_l)
-				e^{+i(\omega t+\vartheta)}
-			\end{equation}
-			\begin{equation}
-				\hat{X}(t)
-				=
-				\int_{-\infty}^{+\infty}
-				\frac{\dd{\omega}}{2\pi}
-				\left[
+			\begin{block}{Differential photocurrent signal}
+				\begin{equation}
+					i(t)
+					\propto
+					\Re
+					\int_{-B_d/2}^{+B_d/2}
+					\frac{\dd{\omega}}{2\pi}
+					\beta(\omega+\omega_l)
+					e^{+i(\omega t+\vartheta)}
+				\end{equation}
+	        \end{block}
+
+			\begin{block}{Phase-rotated quadrature operator}
+				\begin{equation}
+					\hat{X}(t)
+					=
+					\int_{-\infty}^{+\infty}
+					\frac{\dd{\omega}}{2\pi}
+					\left[
+						\hat{a}(\omega)
+						e^{-i(\omega t+\vartheta)}
+						+
+						\text{H.c.}
+					\right]
+				\end{equation}
+			\end{block}
+
+			\begin{block}{Frequency-converted annihilation operator}
+				\begin{equation}
+					\hat{U}^\dagger
 					\hat{a}(\omega)
-					e^{-i\omega t}
-					+
-					\text{H.c.}
-				\right]
-			\end{equation}
-			\begin{equation}
-				\hat{U}^\dagger
-				\hat{a}(\omega)
-				\hat{U}
-				=
-				\sum_{m\in\mathbb{Z}}
-				J_m(\theta)
-				\hat{a}(\omega+m\omega_l)
-				e^{-im\vartheta}
-			\end{equation}
+					\hat{U}
+					=
+					\sum_{m\in\mathbb{Z}}
+					J_m(\theta)
+					\hat{a}(\omega+m\omega_l)
+					e^{-im\vartheta}
+				\end{equation}
+			\end{block}
 		\end{columns}
 	\end{frame}
 	
 	\section{Conclusion and outlook}
 	
-	\begin{frame}{Conclusion and outlook}
+	\begin{frame}{Summary of the slides}
+		\begin{itemize}
+			\item Introduction to CV-QKD as a mechanism for secure key distribution.
+			\item Raised awareness to dependence of transmissions.
+			\item Introduction to a software-defined coherent transmission system.
+			\item Introduction to concepts and methods from communication engineering.
+			\item Extension of coherent transmission system to quantum regime.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}{Additional topics covered in the thesis}
+		\begin{itemize}
+			\item Overview and comparison of DV- and CV-QKD protocols including post processing.
+			\item Derivation of continuous-mode quantum theory of light rooted in quantum field theory.
+			\item Summary of quantum models for the most important (electro-)optical components as building blocks for communication system.
+		\end{itemize}		
+	\end{frame}
+	
+	\begin{frame}{Outlook}
+		\begin{itemize}
+			\item Noise model for measurements.
+			\item Comparison of image band and squeezing attack.
+			\item Further transfer of telecommunication methods, e.g., ODFM.
+			\item Properties of frequency-squeezed states.
+			\item Equivalence of tensor-product with continuous-time coherent state transmission.
+		\end{itemize}
 	\end{frame}
 
 \end{document}
