@@ -605,22 +605,22 @@
 		\end{equation}
 	\end{frame}
 	
-	\begin{frame}{In-phase and quadrature modulator}
+	\begin{frame}{In-phase and quadrature modulator as dual-quadrature upconverter}
 		\begin{figure}
 			\begin{tikzpicture}[
 				electrode/.style={very thick},
 				waveguide/.style={line width=1.2mm, rounded corners=1mm},
 			]
 				\draw[electrode] (0,2.8) rectangle ++(2,0.2);
-				\draw[electrode] (0,1.9) rectangle ++(2,0.6) node[pos=0.5] {$I(t)$};
+				\draw[electrode] (0,1.9) rectangle ++(2,0.6) node[pos=0.5] {$x(t)$};
 				\draw[electrode] (0,1.4) rectangle ++(2,0.2);
-				\draw[electrode] (0,0.5) rectangle ++(2,0.6) node[pos=0.5] {$Q(t)$};
+				\draw[electrode] (0,0.5) rectangle ++(2,0.6) node[pos=0.5] {$p(t)$};
 				\draw[electrode] (0,0) rectangle ++(2,0.2);
 		
 				\draw[waveguide] (1,0.8) node[draw, regular polygon, regular polygon sides=6, minimum width=1.05cm, xscale=4] (mzm1) {};
 				\draw[waveguide] (1,2.2) node[draw, regular polygon, regular polygon sides=6, minimum width=1.05cm, xscale=4] (mzm2) {};
 				
-				\draw[electrode] (3.8,1.2) rectangle ++(2,0.6) node[pos=0.5] {$\Lambda$};
+				\draw[electrode] (3.8,1.2) rectangle ++(2,0.6) node[pos=0.5] {$\varphi(t)$};
 				\draw[electrode] (3.8,0.7) rectangle ++(2,0.2);
 				\draw[electrode] (3.8,2.1) rectangle ++(2,0.2);
 		
@@ -639,19 +639,24 @@
 		
 				\draw[waveguide] (mzm1.west) ++(0.3,0) -- ++(-0.2,0) -- ++(-1.2,0.7) coordinate (in) -- ++(1.2,0.7) -- ++(0.2,0) -- ++(0.2,0) (mzm2.west);
 				
-				\draw[waveguide] (in) -- ++(-1.5,0) node[midway, above] {$\alpha(t)$};
-				\draw[waveguide] (out) -- ++(1.5,0) node[midway, above] {$\alpha^\prime(t)$};
+				\draw[waveguide] (in) -- ++(-1.5,0) node[midway, above] {$\ket{g(t)e^{+i\omega_c t}}$};
+				\draw[waveguide] (out) -- ++(1.5,0) node[midway, above] {$\ket{\alpha(t) e^{+i\omega_c t}}$};
 			\end{tikzpicture}
 			\caption{Drawing of an integrated in-phase and quadrature modulator.}
 		\end{figure}
 		\begin{equation}
-			\ket{\beta(t)}
+			\ket{g(t)e^{+i\omega_c t}}
 			\to
-			\ket{\alpha(t)\beta(t)}
+			\ket{\alpha(t)e^{+i\omega_c t}}
 			\qquad
 			\alpha(t)
 			=
-			I(t)+iQ(t)
+			g(t)
+			\left[
+				x(t)
+				+
+				iq(t)
+			\right]
 		\end{equation}
 	\end{frame}
 	
