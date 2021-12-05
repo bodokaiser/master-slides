@@ -544,6 +544,14 @@
 				\alpha(t)
 				e^{+i\omega_c t}
 			\right]
+			\quad
+			\text{with}
+			\quad
+			\alpha(t)
+			=
+			x(t)
+			+
+			ip(t)
 		\end{equation}
 	\end{frame}
 	
@@ -559,7 +567,7 @@
 				\draw[very thick] (-0.5,0) -- ++(0,0.5) -- ++(0.5,0) -- ++(0.5,0.25) -- ++(0,-0.75);
 				\draw[very thick] (3,1) -- ++(0,-1.15) node[below] {$+\omega_c$};
 				\draw[very thick] (-3,1) -- ++(0,-1.15) node[below] {$-\omega_c$};
-				\draw[very thick, dashed] (-3.5,0) -- ++(0,0.5) -- ++(0.5,0) -- ++(0.5,0.25) -- ++(0,-0.75);
+				\draw[very thick, dashed] (-3.5,0) -- ++(0,0.75) -- ++(0.5,-0.25) -- ++(0.5,0) -- ++(0,-0.5);
 				\draw[very thick, dashed] (2.5,0) -- ++(0,0.5) -- ++(0.5,0) -- ++(0.5,0.25) -- ++(0,-0.75);
 				
 				\draw[Bar-Bar, very thick] (-3.5,1.5) -- ++(1,0) node[midway, above] {$B_s$};
@@ -661,7 +669,7 @@
 				\node (in) {$\Re\left[\beta(t)e^{+i\omega_ct}\right]$};
 				\node (mix) [mixer, right=of in] {};
 				\node (low) [lowpassshape, right=of mix] {};
-				\node (osc) [below=of mix] {$\cos(\omega_ct+\vartheta)$};
+				\node (osc) [below=4mm of mix] {$\cos(\omega_lt+\vartheta)$};
 				\node (out) [right=of low] {$u(t)$};
 				
 				\draw[arrow] (in) -- (mix.west);
@@ -680,7 +688,7 @@
 				\node (in) {$u(t)$};
 				\node (adc) [adcshape, right=of in] {};
 				\node (mix) [mixer, right=of adc] {};
-				\node (osc) [below=of mix] {$\exp(i\omega_it)$};
+				\node (osc) [below=4mm of mix] {$\exp(i\omega_it)$};
 				\node (down1) [twoportshape, t={$\downarrow l$}, right=of mix] {};
 				\node (rrc) [twoportshape, t={RRC}, right=of down1] {};
 				\node (down2) [twoportshape, t={$\downarrow k$}, right=of rrc] {};
@@ -694,7 +702,7 @@
 				\draw[arrow] (down2.east) -- (out.west);
 				\draw[arrow] (osc.north) -- (mix.south);
 			\end{tikzpicture}
-			\caption{Block diagram of the symbol-decoding including analog-to-digital conversion and pulse-shaping.}
+			\caption{Block diagram of the analog-to-digital conversion and symbol-decoding.}
 		\end{figure}
 	\end{frame}
 
@@ -729,46 +737,6 @@
 				e^{+i\omega t}
 				+
 				\beta(\omega-\omega_l)^*
-				e^{-i\omega t}
-			\right]
-			e^{-i\vartheta}
-		\end{equation}
-	\end{frame}
-	
-	\begin{frame}{Single-quadrature heterodyne detection}
-		\begin{figure}
-			\begin{tikzpicture}
-				\draw[very thick, -Latex] (0,0) -- ++(0,2.5) node[above] {$\abs{x(\omega)}^2$};
-				\draw[very thick, {-Bar[slant=.5]}] (0,0) -- (3.45,0);
-				\draw[very thick, {Bar[slant=.5]-Latex}] (3.55,0) -- (10,0) node[right] {$\omega$};
-		
-				\draw[very thick] (0,0) -- ++(0,-0.15) node[below] {$0$};
-				\draw[very thick] (2,0) -- ++(0,-0.15) node[below] {$\omega_i$};
-				\draw[very thick] (6,0) -- ++(0,-0.15) node[below] {$\omega_c$};
-		
-				\draw[very thick] (7,0) -- ++(0,-0.15) node[below] {$\omega_l$};
-		
-				\draw[very thick, dashed] (5,0) -- ++(0,0.25) -- ++(0.5,0) -- ++(0,0.75) -- ++(1,-0.75) -- ++(2.5,0) -- ++(0,-0.25);
-				\draw[very thick] (7,0) -- ++(0,1);
-				\draw[very thick] (0,0.5) -- ++(0.5,0) -- ++(1,0.75) -- ++(0,-0.75) -- ++(0.5,0) -- ++(0,-0.5);
-				\draw[very thick, dotted] (0,0.25) -- ++(2,0) -- ++(0,-0.25);
-				
-				\draw[Bar-Bar, very thick] (5.5,1.5) -- ++(1,0) node[midway, above] {$B_s$};
-				\draw[-Bar, very thick] (0,1.5) -- ++(3,0) node[midway, above] {$B_d$};
-			\end{tikzpicture}
-			\caption{Power spectrum illustrating heterodyne detection.}
-		\end{figure}
-		\begin{equation}
-			u(t)
-			=
-			\Re
-			\int_{0}^{+B_d/2}
-			\frac{\dd{\omega}}{2\pi}
-			\left[
-				\beta(\omega+\omega_i)
-				e^{+i\omega t}
-				+
-				z(\omega-\omega_i)^*
 				e^{-i\omega t}
 			\right]
 			e^{-i\vartheta}
@@ -811,6 +779,65 @@
 			\right]
 			e^{-i\vartheta}
 		\end{equation}
+	\end{frame}
+	
+	\begin{frame}{Single-quadrature heterodyne detection}
+		\begin{figure}
+			\begin{tikzpicture}
+				\draw[very thick, -Latex] (0,0) -- ++(0,2.5) node[above] {$\abs{x(\omega)}^2$};
+				\draw[very thick, {-Bar[slant=.5]}] (0,0) -- (3.45,0);
+				\draw[very thick, {Bar[slant=.5]-Latex}] (3.55,0) -- (10,0) node[right] {$\omega$};
+		
+				\draw[very thick] (0,0) -- ++(0,-0.15) node[below] {$0$};
+				\draw[very thick] (2,0) -- ++(0,-0.15) node[below] {$\omega_i$};
+				\draw[very thick] (6,0) -- ++(0,-0.15) node[below] {$\omega_c$};
+		
+				\draw[very thick] (7,0) -- ++(0,-0.15) node[below] {$\omega_l$};
+		
+				\draw[very thick, dashed] (5,0) -- ++(0,0.25) -- ++(0.5,0) -- ++(0,0.75) -- ++(1,-0.75) -- ++(2.5,0) -- ++(0,-0.25);
+				\draw[very thick] (7,0) -- ++(0,1);
+				\draw[very thick] (0,0.5) -- ++(0.5,0) -- ++(1,0.75) -- ++(0,-0.75) -- ++(0.5,0) -- ++(0,-0.5);
+				\draw[very thick, dotted] (0,0.25) -- ++(2,0) -- ++(0,-0.25);
+				
+				\draw[Bar-Bar, very thick] (5.5,1.5) -- ++(1,0) node[midway, above] {$B_s$};
+				\draw[-Bar, very thick] (0,1.5) -- ++(3,0) node[midway, above] {$B_d$};
+			\end{tikzpicture}
+			\caption{Power spectrum illustrating heterodyne detection.}
+		\end{figure}
+		\begin{equation}
+			u(t)
+			=
+			\Re
+			\int_{0}^{+B_d/2}
+			\frac{\dd{\omega}}{2\pi}
+			\left[
+				\beta(\omega+\omega_i)
+				e^{+i\omega t}
+				+
+				\beta(\omega-\omega_i)^*
+				e^{-i\omega t}
+			\right]
+			e^{-i\vartheta}
+		\end{equation}
+	\end{frame}
+	
+	\begin{frame}{Comparison homo- and heterodyne detection}
+		\begin{table}
+			\caption{Comparison of coherent receiver designs and their implications}
+			\begin{tabular}{lccccc}
+			    \toprule
+			    & Homodyne (single) & Homodyne (dual) & Heterodyne \\
+			    \midrule
+			    Balanced detectors & \num{1} & \num{2} & \num{1} \\
+			    Quadratures & \num{1} & \num{2} & \num{2} \\
+			    Intermediate frequency & \multicolumn{2}{c}{$\omega_i=0$} & $\omega_i\neq 0$ \\
+			    Optical complexity & Low & High & Low \\
+			    Signal bandwidth & High & High & Low \\
+			    LO synchronization & Frequency and phase & Frequency & Bandwidth \\
+			    SNR & High & Low & Low \\
+			    \bottomrule
+			\end{tabular}
+		\end{table}
 	\end{frame}
 	
 	\begin{frame}{Balanced detector as single-quadrature downconverter}
@@ -901,7 +928,7 @@
 		\begin{itemize}
 			\item Noise model for measurements.
 			\item Comparison of image band and squeezing attack.
-			\item Further transfer of telecommunication methods, e.g., ODFM.
+			\item Further transfer of telecommunication methods, e.g., orthogonal frequency-division multiplexing (OFDM).
 			\item Properties of frequency-squeezed states.
 			\item Equivalence of tensor-product with continuous-time coherent state transmission.
 		\end{itemize}
