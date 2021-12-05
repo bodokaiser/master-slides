@@ -51,7 +51,7 @@
 	\end{frame}
 	
 	% why is QKD interesting? -> intersection of multiple disciplines (quantum information theory, quantum optics, communication engineering)	
-	\begin{frame}{Preview}
+	\begin{frame}{Outline}
 		\begin{columns}[c, onlytextwidth]
 			\column{0.6\textwidth}
 			\begin{figure}
@@ -97,11 +97,11 @@
 				\node[block, above=of authentication] (transmitter) {Transmitter};
 				\node[block, right=10mm of transmitter] (channel) {Channel};
 				\node[block, right=10mm of channel] (receiver) {Receiver};
-				\node[block, below=of receiver] (verification) {Verificier};
+				\node[block, below=of receiver] (verification) {Verifier};
 				\node[block, below=of verification] (decryption) {Decrypter};
 				\coordinate[below=of decryption] (out);
 	
-				\path (encryption) -- (verification) node[midway, block, align=center] (key) {Secret-key};
+				\path (encryption) -- (verification) node[midway, block, align=center] (key) {Secret key};
 	
 				\draw[arrow] (key.west) to[out=210, in=0] (encryption.east);
 				\draw[arrow] (key.west) to[out=150, in=0]  (authentication.east);
@@ -519,7 +519,7 @@
 		\end{figure}
 	\end{frame}
 
-	\begin{frame}{Dual-quadrature upconversion in time domain}
+	\begin{frame}{Dual-quadrature upconversion in the time domain}
 		\begin{figure}
 			\begin{tikzpicture}[
 					line width=0.2mm,
@@ -575,7 +575,7 @@
 		\end{equation}
 	\end{frame}
 	
-	\begin{frame}{Dual-quadrature upconversion in frequency domain}
+	\begin{frame}{Dual-quadrature upconversion in the frequency domain}
 		\begin{figure}
 			\begin{tikzpicture}
 				\draw[very thick, -Latex] (0,0) -- ++(0,2.5) node[above] {$\abs{\alpha(\omega)}^2$};
@@ -909,7 +909,7 @@
 	
 	\section{Conclusion and outlook}
 	
-	\begin{frame}{Summary of the slides}
+	\begin{frame}{Summary}
 		\begin{itemize}
 			\item Introduction to CV-QKD as a mechanism for secure key distribution.
 			\item Raised awareness to dependence of transmissions.
