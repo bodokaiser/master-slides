@@ -256,10 +256,8 @@
 			\caption{Phase space diagram of continuous-time coherent states with mean (dots) and variances (opaque circles) at two time instances.}
 		\end{figure}
 	\end{frame}
-	
-	\section{Coherent state transmitter}
-	
-	\begin{frame}{Software-defined transmitter architecture}
+
+	\begin{frame}{Software-defined transmission system}
 		\begin{figure}
 			\begin{tikzpicture}[
 				node distance=15mm,
@@ -281,7 +279,29 @@
 			\end{tikzpicture}
 			\caption{Block diagram of the software-defined transmitter architecture.}
 		\end{figure}
+		
+		\begin{figure}
+			\begin{tikzpicture}[
+				node distance=15mm,
+				arrow/.style={very thick, -Latex},
+				block/.style={draw, very thick, minimum width=18mm, minimum height=12mm},
+			]
+				\coordinate (in) at (0,0);
+				\node (dsp) [block, right=of in] {DEMOD};
+				\node (dac) [block, right=of dsp] {ADC};
+				\node (mod) [block, right=of dac] {DSP};
+				\coordinate[right=of mod] (out);
+				
+				\draw[arrow] (in) -- (dsp) node[midway, above] {$\ket{\beta(t)}$};
+				\draw[arrow] (dsp.east) -- (dac.west) node[midway, above] {$u(t)$};
+				\draw[arrow] (dac.east) -- (mod.west) node[midway, above]{$u[m]$};
+				\draw[arrow] (mod) -- (out) node[midway, above] {$\left\{\beta_n\right\}_{n\in I}$};
+			\end{tikzpicture}
+			\caption{Block diagram of software-defined receiver architecture.}
+		\end{figure}
 	\end{frame}
+
+	\section{Coherent state transmitter}
 	
 	\begin{frame}{Digital signal processing pipeline for symbol encoding}
 		\begin{figure}
@@ -636,28 +656,6 @@
 	\end{frame}
 	
 	\section{Coherent state receiver}
-	
-	\begin{frame}{Software-defined receiver architecture}
-		\begin{figure}
-			\begin{tikzpicture}[
-				node distance=15mm,
-				arrow/.style={very thick, -Latex},
-				block/.style={draw, very thick, minimum width=18mm, minimum height=12mm},
-			]
-				\coordinate (in) at (0,0);
-				\node (dsp) [block, right=of in] {DEMOD};
-				\node (dac) [block, right=of dsp] {ADC};
-				\node (mod) [block, right=of dac] {DSP};
-				\coordinate[right=of mod] (out);
-				
-				\draw[arrow] (in) -- (dsp) node[midway, above] {$\ket{\beta(t)}$};
-				\draw[arrow] (dsp.east) -- (dac.west) node[midway, above] {$u(t)$};
-				\draw[arrow] (dac.east) -- (mod.west) node[midway, above]{$u[m]$};
-				\draw[arrow] (mod) -- (out) node[midway, above] {$\left\{\beta_n\right\}_{n\in I}$};
-			\end{tikzpicture}
-			\caption{Block diagram of software-defined receiver architecture including electro-optical demodulation, analog-to-digital converter, and digital signal processing for symbol decoding.}
-		\end{figure}
-	\end{frame}
 	
 	\begin{frame}{Signal processing pipeline for symbol decoding}
 		\begin{figure}
