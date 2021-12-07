@@ -12,6 +12,7 @@
 \usepackage{siunitx}
 \usepackage{pgfplots}
 \usepackage{circuitikz}
+\usepackage{appendixnumberbeamer}
 
 \usetheme{metropolis}
 
@@ -1004,7 +1005,7 @@
 			\end{block}
 		\end{columns}
 	\end{frame}
-	
+
 	\section{Conclusion and outlook}
 	
 	\begin{frame}{Summary}
@@ -1034,5 +1035,408 @@
 			\item Equivalence of tensor-product with continuous-time coherent state transmission.
 		\end{itemize}
 	\end{frame}
+	
+	\appendix
+	
+	\begin{frame}{Maxwell equation of motion in the radiation gauge and momentum space}
+		Free equation of motion in radiation gauge:
+		\begin{equation}
+			\partial_t^2
+			\vb{A}
+			=
+			\laplace
+			\vb{A}
+			\qquad
+			A_0=0
+			\qquad
+			\partial_iA^i
+			=
+			0
+		\end{equation}
+		Four-dimensional Fourier transform:
+		\begin{equation}
+			\vb{A}(t,\vb{x})
+			=
+			\int\frac{\dd[4]{p}}{(2\pi)^4}
+			\vb{A}(p_0,\vb{p})
+			e^{-ip_0t+i\vb{p}\vdot\vb{x}}
+		\end{equation}
+		Equation of motion in momentum space:
+		\begin{equation}
+			0
+			=
+			\left(p_0-\norm{\vb{p}}\right)
+			\left(p_0+\norm{\vb{p}}\right)
+			\qquad
+			\omega(\vb{p})
+			=
+			\norm{\vb{p}}
+		\end{equation}		
+	\end{frame}
+	
+	\begin{frame}{Plane-wave and polarization basis expansion in the radiation gauge}
+		General plane-wave expansion in radiation gauge:
+		\begin{equation}
+			\begin{split}
+				\vb{A}(t,\vb{x})
+				&=
+				\int\frac{\dd[4]{p}}{(2\pi)^3}
+				\delta^{(1)}\left(p_0^2-\omega(\vb{p})^2\right)
+				\vb{A}(p_0,\vb{p})
+				e^{-ip_0t+i\vb{p}\vdot\vb{x}}
+				\\
+				&=
+				\int\frac{\dd[4]{p}}{(2\pi)^3\sqrt{2\omega(\vb{p})}}
+				\vb{A}\!\left(\omega(\vb{p}),\vb{p}\right)
+				e^{-ip_0t+i\vb{p}\vdot\vb{x}}
+				+
+				\text{h.c.}
+			\end{split}
+		\end{equation}
+		Polarization basis expansion
+		\begin{equation}
+			\vb{A}(t,\vb{x})
+			=
+			\sum_{\lambda=1,2}
+			a_\lambda(\vb{p})
+			\vu{e}_\lambda(\vb{p})
+		\end{equation}
+		Polarization basis transverse to momentum:
+		\begin{equation}
+			\vb{p}\vdot\vu{e}_\lambda(\vb{p})
+			=
+			0
+			\qquad
+			\vu{e}_\lambda(\vb{p})
+			\vu{e}_\sigma(\vb{p})
+			=
+			\delta_{\lambda,\sigma}
+			\qquad
+			\sum_{\lambda=1,2}
+			\vu{e}_\lambda(\vb{p})^i
+			\vu{e}_\lambda(\vb{p})^j
+			=
+			\delta^{ij}
+			-
+			\frac{p^ip^j}{\vb{p}^2}
+		\end{equation}
+	\end{frame}
+	
+	\begin{frame}{Canonical quantization in the Coulomb gauge}
+		Conjugate momentum density:
+		\begin{equation}
+			\Pi_i
+			=
+			\partial_t A_i
+			=
+			E_i
+			=
+			-
+			E^i
+		\end{equation}
+		Equal-time commutation relations:
+		\begin{align}
+			\comm{\hat{A}_i(t,\vb{x})}{\hat{E}_j(t,\vb{y})}
+			&=
+			-i
+			\delta_{\perp,ij}^{(3)}(\vb{x}-\vb{y})
+			\\
+			\comm{\hat{A}_i(t,\vb{x})}{\hat{A}_j(t,\vb{y})}
+			&=
+			\comm{\hat{E}_i(t,\vb{x})}{\hat{E}_j(t,\vb{y})}
+			=
+			0
+		\end{align}
+		Transverse delta distribution:
+		\begin{equation}
+			\delta_{\perp,ij}^{(3)}(\vb{x}-\vb{y})
+			=
+			\left(
+				\delta_{ij}
+				-
+				\frac{\partial_i\partial_j}{\partial^2}
+			\right)
+			\delta^{(3)}(\vb{x}-\vb{y})
+			=
+			\int\frac{\dd[3]{p}}{(2\pi)^3}
+			\left(
+				\delta_{ij}
+				-
+				\frac{p_ip_j}{\vb{p}^2}
+			\right)
+			e^{i\vb{p}\vdot\vb{x}}
+		\end{equation}
+	\end{frame}
+	
+	\begin{frame}{Maxwell field operators}
+		Negative-frequency Maxwell field operator
+		\begin{equation}
+			\vb{A}^{(-)}(t,\vb{x})
+			=
+			\sum_{\lambda=1,2}
+			\int\frac{\dd[3]{p}}{(2\pi)^3\sqrt{2\omega(\vb{p})}}
+			\hat{a}_\lambda(\vb{p})
+			\vu{e}_\lambda(\vb{p})
+			e^{-i\omega(\vb{p})t+i\vb{p}\vdot\vb{x}}
+		\end{equation}
+		Negative-frequency electric field operator
+		\begin{equation}
+			\vb{E}^{(-)}(t,\vb{x})
+			=
+			-i
+			\sum_{\lambda=1,2}
+			\int\frac{\dd[3]{p}}{(2\pi)^3\sqrt{2\omega(\vb{p})}}
+			\omega(\vb{p})
+			\hat{a}_\lambda(\vb{p})
+			\vu{e}_\lambda(\vb{p})
+			e^{-i\omega(\vb{p})t+i\vb{p}\vdot\vb{x}}
+		\end{equation}
+		Hamiltonian and momentum operator
+		\begin{align}
+			\hat{H}
+			&=
+			\sum_{\lambda=1,2}
+			\int\frac{\dd[3]{p}}{(2\pi)^3}
+			\omega(\vb{p})
+			\hat{a}_\lambda^\dagger(\vb{p})
+			\hat{a}_\lambda(\vb{p})
+			&
+			\vu{P}
+			&=
+			\sum_{\lambda=1,2}
+			\int\frac{\dd[3]{p}}{(2\pi)^3}
+			\vb{p}
+			\hat{a}_\lambda^\dagger(\vb{p})
+			\hat{a}_\lambda(\vb{p})
+		\end{align}
+	\end{frame}
+	
+	\begin{frame}{Axiomatic particle state construction}
+		\begin{columns}[c, onlytextwidth]
+			\column{0.5\textwidth}
+			\textbf{Vacuum state}
 
+			Poincare invariance:
+			\begin{equation}
+				\hat{U}(a,\Lambda)
+				\ket{0}
+				=
+				\ket{0}
+			\end{equation}
+			Implies zero energy and momentum:
+			\begin{equation}
+				\hat{H}
+				\ket{0}
+				=
+				0
+				\ket{0}
+				\qquad
+				\vu{P}
+				\ket{0}
+				=
+				\vb{0}
+				\ket{0}
+			\end{equation}
+			Implies annihilation operator destroying vacuum:
+			\begin{equation}
+				\hat{a}(\vb{p})
+				\ket{0}
+				=
+				0
+			\end{equation}
+			
+			\column{0.5\textwidth}
+			\textbf{Momentum state}
+			
+			Algebraic commutation relations:
+			\begin{align}
+				\comm{\hat{N}}{\hat{a}^\dagger(\vb{p})}
+				&=
+				\hat{a}^\dagger(\vb{p})
+				\\
+				\comm{\vu{P}}{\hat{a}^\dagger(\vb{p})}
+				&=
+				\vb{p}
+				\hat{a}^\dagger(\vb{p})
+			\end{align}
+			Implies eigenstates:
+			\begin{align}
+				\hat{N}
+				\hat{a}^\dagger(\vb{p})
+				\ket{0}
+				&=
+				1
+				\hat{a}^\dagger(\vb{p})
+				\ket{0}
+				\\
+				\vu{P}
+				\hat{a}^\dagger(\vb{p})
+				\ket{0}
+				&=
+				\vb{p}
+				\hat{a}^\dagger(\vb{p})
+				\ket{0}
+			\end{align}
+			\alert{but} not normalizable
+			\begin{equation}
+				\bra{0}
+				\hat{a}(\vb{p})
+				\hat{a}^\dagger(\vb{p})
+				\ket{0}
+				=
+				(2\pi)^3
+				\delta^{(3)}(\vb{p}-\vb{q})
+			\end{equation}
+		\end{columns}
+	\end{frame}
+	
+	\begin{frame}{Smeared single-particle state}
+		Interpretation as quantum operators as distributions:
+		\begin{equation}
+			\hat{A}^{(+)}[f]
+			\ket{0}
+			=
+			\int\dd[4]{x}
+			f(t,\vb{x})
+			\hat{A}^{(+)}(t,\vb{x})
+			=
+			\int\frac{\dd[3]{p}}{(2\pi)^3}
+			\frac{f\!\left(\omega(\vb{p}),\vb{p}\right)}{\sqrt{2\omega(\vb{p})}}
+		\end{equation}
+		Normalizable iff:
+		\begin{equation}
+			\bra{0}
+			\hat{A}^{(-)}[f]
+			\hat{A}^{(+)}[f]
+			\ket{0}
+			=
+			\int\frac{\dd[3]{p}}{(2\pi)^3}
+			\abs*{\frac{f\!\left(\omega(\vb{p}),\vb{p}\right)}{\sqrt{2\omega(\vb{p})}}}^2
+			=
+			1
+		\end{equation}
+		Implies eigenstates:
+		\begin{equation}
+			\hat{N}
+			\hat{A}^{(+)}[f]
+			\ket{0}
+			=
+			1
+			\hat{A}^{(+)}[f]
+			\ket{0}
+			\qquad
+			\hat{H}
+			\hat{A}^{(+)}[f]
+			\ket{0}
+			=
+			\int\frac{\dd[3]{p}}{(2\pi)^3}
+			\omega(\vb{p})
+			\abs*{\frac{f\!\left(\omega(\vb{p}),\vb{p}\right)}{\sqrt{2\omega(\vb{p})}}}^2
+			\hat{A}^{(+)}[f]
+			\ket{0}
+		\end{equation}
+	\end{frame}
+	
+	\begin{frame}{Generalized number and coherent state}
+		\begin{columns}[c, onlytextwidth]
+			\column{0.5\textwidth}
+			\textbf{Number state}
+			\begin{equation}
+				\ket{n_f}
+				=
+				\frac{1}{\sqrt{n!}}
+				\hat{A}^{(+)}[f]^n
+				\ket{0}
+			\end{equation}
+			Mean energy:
+			\begin{equation}
+				n
+				\int\frac{\dd[3]{p}}{(2\pi)^3}
+				\omega(\vb{p})
+				\abs*{\frac{f\!\left(\omega(\vb{p}),\vb{p}\right)}{\sqrt{2\omega(\vb{p})}}}^2
+			\end{equation}
+			Electric field at $(t,\vb{x})$:
+			\begin{equation}
+				0
+				\pm
+				\frac{1}{2}
+				\int\frac{\dd[3]{p}}{(2\pi)^3}
+				\omega(\vb{p})
+				+
+				n
+				\abs{\Psi(t,\vb{x})}^2
+			\end{equation}
+
+			\column{0.5\textwidth}
+			\textbf{Coherent state}
+			\begin{equation}
+				\ket{\alpha}
+				=
+				\exp\left\{
+					\hat{A}^{(+)}[\alpha]
+					-
+					\text{H.c.}
+				\right\}
+				\ket{0}
+			\end{equation}
+			Mean energy:
+			\begin{equation}
+				\int\frac{\dd[3]{p}}{(2\pi)^3}
+				\omega(\vb{p})
+				\abs*{\frac{\alpha\!\left(\omega(\vb{p}),\vb{p}\right)}{\sqrt{2\omega(\vb{p})}}}^2
+			\end{equation}
+			Electric field at $(t,\vb{x})$:
+			\begin{equation}
+				0
+				\pm
+				\frac{1}{2}
+				\int\frac{\dd[3]{p}}{(2\pi)^3}
+				\omega(\vb{p})
+			\end{equation}
+		\end{columns}
+	\end{frame}
+	
+	\begin{frame}{Connection to continuous-mode quantum optics}
+		\begin{columns}[c, onlytextwidth]
+			\column{0.5\textwidth}
+			\begin{block}{Central assumption}
+				No relative motion, i.e., no Lorentz boosts.
+			\end{block}
+
+			Typical approximations:
+			\begin{itemize}
+				\item Neglect polarization degrees of freedom
+				\item Neglect transverse momentum distribution
+				\item Neglect relativistic Lorentz factor $1/\sqrt{2\omega}$
+			\end{itemize}
+
+			\column{0.5\textwidth}
+			Phase-rotated quadrature operator:
+			\begin{equation}
+				\hat{X}(t)
+				=
+				\frac{1}{\sqrt{2}}
+				\int\frac{\dd{\omega}}{2\pi}
+				\biggl\{
+					\hat{a}(\omega)
+					e^{-i(\omega t+\vartheta)}
+					+
+					\text{H.c.}
+				\biggr\}
+			\end{equation}
+			Maxwell field at $(t,\vb{x})$:
+			\begin{equation}
+				\hat{A}(t,\vb{x})
+				=
+				\int\frac{\dd{\omega}}{2\pi\sqrt{2\omega}}
+				\biggl\{
+					\hat{a}(\omega)
+					e^{-i\omega(t-x)}
+					+
+					\text{H.c.}					
+				\biggr\}
+			\end{equation}
+		\end{columns}
+	\end{frame}
+	
 \end{document}
