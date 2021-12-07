@@ -38,7 +38,7 @@
 \title{A theoretical framework for CV-QKD}
 \date{\today}
 \author{Bodo Kaiser}
-\institute{Ludwig-Maximilians-Universität München}
+\institute{Ludwig-Maximilians-Universität München \& Huawei Munich Research Center}
 
 \begin{document}
 
@@ -658,6 +658,104 @@
 				iq(t)
 			\right]
 		\end{equation}
+	\end{frame}
+	
+	\begin{frame}{Interaction Hamiltonian of the electro-optical phase modulator}
+		\begin{figure}
+			\begin{tikzpicture}[
+				electrode/.style={fill=black},
+				waveform/.style={thick},
+				label/.style={anchor=west},
+			]
+				\draw[very thick] (0,-0.2) rectangle ++(5,2.4);
+				\draw[electrode] (0,-0.2) rectangle ++(5,0.2);
+				\draw[electrode] (0,2) rectangle ++(5,0.2);
+		
+				\draw[waveform, domain=0:5, samples=500] plot (\x,{1+cos(200*\x+42)});
+				\draw[waveform, domain=-2:0, samples=500] plot (\x-0.1,{1+0.2*sin(1000*\x)});
+				\draw[waveform, domain=5:7, samples=500] plot (\x+0.1,{1+0.2*sin(1000*\x)});
+				\draw[waveform, domain=5:7, samples=500] plot (\x+0.1,{1.7+0.1*sin(1200*\x)});
+				\draw[waveform, domain=5:7, samples=500] plot (\x+0.1,{0.3+0.1*sin(800*\x)});
+		
+				\draw[Bar-Bar] (0,-0.4) -- ++(5,0) node[midway, below] {$L$};
+		
+				%\coordinate (origin) at (-2.8,-0.4);
+				%\draw[-Latex] (origin) -- ++(1,0) node[above] {$x$};
+				%\draw[-Latex] (origin) -- ++(0,0.5) node[right] {$z$};
+		
+				\node[label] at (-2.6,1) {$\omega$};
+				\node[label] at (7.1,1) {$\omega$};
+				\node[label] at (7.1,1.7) {$\omega+\Omega_0$};
+				\node[label] at (7.1,0.3) {$\omega-\Omega_0$};
+		
+				\node at (2.5,1) {$\Omega_0$};
+			\end{tikzpicture}
+			\caption{Traveling-wave electro-optical phase modulator of length $L$.}
+		\end{figure}
+		\begin{equation}
+			\hat{H}_\text{int}
+			=
+			\int\frac{\dd{\omega}}{2\pi}
+			\int\frac{\dd{\Omega}}{2\pi}
+			g(\omega,\Omega)
+			\hat{a}^\dagger(\omega)
+			\hat{a}(\Omega)
+			\hat{a}(\omega-\Omega)
+			+
+			\text{H.c.}
+		\end{equation}
+	\end{frame}
+	
+	\begin{frame}{Single-mode frequency-conversion operator}
+		\begin{columns}[c, onlytextwidth]
+			\column{0.45\textwidth}
+			Simplifying assumptions:
+			\begin{itemize}
+				\item $\hat{a}(\Omega)\to\beta(\Omega)$
+				\item $\beta(\Omega)=\beta_02\pi\delta^{(1)}\delta^{(1)}(\Omega-\Omega_0)$
+				\item $\theta e^{i\varphi}/2=\beta_0^*g(\omega,\Omega)/T$
+			\end{itemize}
+			Evolution operator:
+			\begin{equation}
+				\hat{U}_\text{int}
+				=
+				e^{
+					-
+					\frac{1}{2}
+					\theta
+					\hat{T}_+(\Omega_0)
+					e^{-i\varphi}
+					+
+					\text{H.c.}
+				}
+			\end{equation}
+
+			\column{0.45\textwidth}
+			Upconversion operator:
+			\begin{equation}
+				\hat{T}_+(\Omega_0)
+				=
+				\int\frac{\dd{\omega}}{2\pi}
+				\hat{a}^\dagger(\omega+\Omega_0)
+				\hat{a}(\omega)
+			\end{equation}
+			\begin{equation}
+				\comm{\hat{T}_+(\Omega_0)}{\hat{a}^\dagger(\omega)}
+				=
+				\hat{a}^\dagger(\omega+\Omega_0)
+			\end{equation}
+			Creation operator transform:
+			\begin{equation}
+				\hat{U}^\dagger
+				\hat{a}(\omega)
+				\hat{U}
+				=
+				\sum_{m\in\mathbb{Z}}
+				J_m(\theta)
+				\hat{a}(\omega+m\omega_l)
+				e^{-im\vartheta}				
+			\end{equation}
+		\end{columns}
 	\end{frame}
 	
 	\section{Coherent state receiver}
