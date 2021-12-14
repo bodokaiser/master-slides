@@ -790,7 +790,7 @@
 				\node (in) {$u(t)$};
 				\node (adc) [adcshape, right=of in] {};
 				\node (mix) [mixer, right=of adc] {};
-				\node (osc) [below=4mm of mix] {$\exp(i\omega_it)$};
+				\node (osc) [below=4mm of mix] {$\exp(-i\omega_it)$};
 				\node (down1) [twoportshape, t={$\downarrow l$}, right=of mix] {};
 				\node (rrc) [twoportshape, t={RRC}, right=of down1] {};
 				\node (down2) [twoportshape, t={$\downarrow k$}, right=of rrc] {};
@@ -1387,7 +1387,11 @@
 			\end{equation}
 			Electric field at $(t,\vb{x})$:
 			\begin{equation}
-				0
+				\int\frac{\dd[3]{p}}{(2\pi)^3}
+				\Im\left\{
+					\alpha(\vb{p})
+					e^{-i\omega(\vb{p})t+i\vb{p}\vdot\vb{x}}
+				\right\}
 				\pm
 				\frac{1}{2}
 				\int\frac{\dd[3]{p}}{(2\pi)^3}
